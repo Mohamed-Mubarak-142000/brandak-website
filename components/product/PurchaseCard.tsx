@@ -5,12 +5,13 @@ import { OpenInApp } from '@/components/OpenInApp';
 import { Rating } from '@/components/Rating';
 import { StoreLogo } from '@/components/StoreCard';
 import { StoreTypeBadge } from '@/components/StoreTypeBadge';
+import { WishlistButton } from '@/components/WishlistButton';
 import { date, discountPercent, num, originalPrice, price } from '@/lib/format';
 import { appPath } from '@/lib/links';
 import type { ProductDetail, PublicBrand, StoreType } from '@/lib/types';
 
+import { AddToCart, LivePrice } from './AddToCart';
 import { deliverySummary } from './DeliveryInfo';
-import { ProductOptions } from './ProductOptions';
 import { StoreTypeDetails } from './StoreTypeDetails';
 
 function StockLine({ product }: { product: ProductDetail }) {
@@ -33,8 +34,8 @@ function StockLine({ product }: { product: ProductDetail }) {
 }
 
 /**
- * Everything needed to decide, next to the photos: store, title, price, stock, options, the
- * store-type specific part, and the one action — order in the app.
+ * Everything needed to decide, next to the photos: store, title, price, stock, then the
+ * interactive part (options, quantity, add to cart) and the store-type specific details.
  */
 export function PurchaseCard({ product, store, storeType }: { product: ProductDetail; store: PublicBrand | null; storeType: StoreType }) {
   const slug = product.brand.slug;
@@ -45,6 +46,7 @@ export function PurchaseCard({ product, store, storeType }: { product: ProductDe
   // The API only attaches a sale while it runs.
   const saleEnds = product.sale?.endsAt ?? null;
   const trust = deliverySummary(store);
+  const acceptsOrders = store?.shipping?.acceptsOrders ?? true;
 
   return (
     <div className="space-y-6 lg:rounded-panel lg:border lg:border-line lg:bg-surface lg:p-6 lg:shadow-card">
@@ -62,7 +64,10 @@ export function PurchaseCard({ product, store, storeType }: { product: ProductDe
           </div>
         ) : null}
 
-        <h1 className="text-section font-extrabold leading-snug sm:text-page">{product.title}</h1>
+        <div className="flex items-start gap-3">
+          <h1 className="min-w-0 flex-1 text-section font-extrabold leading-snug sm:text-page">{product.title}</h1>
+          <WishlistButton productId={product.id} variant="outline" />
+        </div>
         {product.ratingCount > 0 ? (
           <a href="#reviews" className="inline-flex min-h-8 items-center gap-2 hover:underline">
             <Rating avg={product.ratingAvg} count={product.ratingCount} className="text-ui" />
@@ -73,7 +78,7 @@ export function PurchaseCard({ product, store, storeType }: { product: ProductDe
 
       <div className="space-y-3 border-y border-line py-5">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <span className="text-page font-extrabold leading-none sm:text-[2rem]">{price(product.price)}</span>
+          <LivePrice product={product} className="text-page font-extrabold leading-none sm:text-[2rem]" />
           {before ? (
             <s className="text-body text-ink-3">
               <span className="sr-only">بدل </span>
@@ -95,18 +100,13 @@ export function PurchaseCard({ product, store, storeType }: { product: ProductDe
         </div>
       </div>
 
-      <ProductOptions variants={product.variants} sizeLabel={product.sizeLabel} colorLabel={product.colorLabel} />
+      <AddToCart product={product} acceptsOrders={acceptsOrders} details={<StoreTypeDetails product={product} storeType={storeType} />} />
 
-      <StoreTypeDetails product={product} storeType={storeType} />
-
-      <div>
-        <OpenInApp path={appPath.product(product.id)} className="min-h-14 w-full text-body">
-          <Smartphone aria-hidden className="size-5" />
-          {product.inStock ? 'اطلبه من التطبيق' : 'افتحه في التطبيق'}
+      <div className="flex justify-center">
+        <OpenInApp path={appPath.product(product.id)} variant="quiet" className="text-ui">
+          <Smartphone aria-hidden className="size-4" />
+          افتح في التطبيق
         </OpenInApp>
-        <p className="mt-2.5 text-center text-meta text-ink-3">
-          {product.inStock ? 'السلة والكوبونات والنقاط في التطبيق.' : 'تابع المتجر من التطبيق ويوصلك الجديد. السلة والكوبونات والنقاط في التطبيق.'}
-        </p>
       </div>
 
       <ul className="divide-y divide-line rounded-card bg-sunken px-4">

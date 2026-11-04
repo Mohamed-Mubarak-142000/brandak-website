@@ -2,7 +2,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { safeColor } from '@/components/catalog/CampaignCard';
-import { OpenInApp } from '@/components/OpenInApp';
 import { Carousel } from '@/components/ui/Carousel';
 import { date, num, percent } from '@/lib/format';
 import type { Campaign } from '@/lib/types';
@@ -74,7 +73,7 @@ function CampaignSide({ campaign }: { campaign: Campaign }) {
 }
 
 /**
- * The home banner: running campaigns first (each in its own colour), then the app's four
+ * The home banner: running campaigns first (each in its own colour), then the four
  * onboarding promises. Plays by itself and loops.
  */
 export function HeroBanner({ campaigns, commissionRate }: { campaigns: Campaign[]; commissionRate: number }) {
@@ -112,11 +111,11 @@ export function HeroBanner({ campaigns, commissionRate }: { campaigns: Campaign[
       key="shop"
       background="#eef4fb"
       title={'سلة لكل متجر،\nوتتبّع لحد بابك'}
-      body="اطلب من أكتر من متجر في نفس الوقت، وتابع كل طلب من التأكيد للتوصيل."
+      body="اطلب من أكتر من متجر في نفس الوقت هنا على الموقع، وتابع كل طلب من التأكيد للتوصيل."
       action={
-        <OpenInApp path="" className="min-h-12 px-7 text-body">
-          حمّل التطبيق
-        </OpenInApp>
+        <Link href="/stores" className={cta}>
+          ابدأ التسوّق
+        </Link>
       }
       side={<Art name="onboarding-shop" />}
     />,

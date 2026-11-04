@@ -24,10 +24,10 @@ export const metadata: Metadata = {
   alternates: { canonical: '/sell' },
 };
 
-/** The real order of things in the app's seller flow. */
+/** The real order of things in the seller flow, on the site or in the app. */
 const STEPS = [
-  { title: 'حمّل التطبيق', body: 'نزّل فاترينة من Google Play واعمل حساب بإيميلك.' },
-  { title: 'افتح متجرك واختار نوع النشاط', body: 'من الحساب دوس «افتح متجرك»: البيانات والأقسام والتواصل، واللوجو والغلاف.' },
+  { title: 'اعمل حساب', body: 'سجّل بإيميلك هنا على الموقع، أو نزّل فاترينة من Google Play وسجّل منه.' },
+  { title: 'افتح متجرك واختار نوع النشاط', body: 'من صفحة «افتح متجرك» على الموقع أو من الحساب في التطبيق: البيانات والأقسام والتواصل، واللوجو والغلاف.' },
   { title: 'المراجعة', body: 'فريقنا بيراجع بيانات المتجر، عادةً خلال يوم عمل، ويوصلك إشعار أول ما يتفعّل.' },
   { title: 'ضيف منتجاتك واستقبل الطلبات', body: 'ارفع منتجاتك، والطلبات بتوصلك بإشعار على موبايلك.' },
 ];
@@ -60,8 +60,11 @@ export default async function SellPage() {
             فتح المتجر ببلاش، وبتدفع {rate} بس من قيمة المنتجات لما الطلب يتسلّم للعميل. والعميل بيدفع كاش عند الاستلام في أي محافظة.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <OpenInApp path={appPath.sell} className="min-h-12 px-6 text-body">
-              افتح متجرك من التطبيق
+            <Link href="/seller/apply" className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent px-6 text-body font-bold text-on-accent transition-colors hover:bg-accent-hover">
+              افتح متجرك
+            </Link>
+            <OpenInApp path={appPath.sell} variant="secondary" className="min-h-12 px-6 text-body">
+              أو افتحه من التطبيق
             </OpenInApp>
             <a
               href="#deal"
@@ -96,7 +99,7 @@ export default async function SellPage() {
       {/* Store types */}
       <section className="border-t border-line">
         <Container className="py-12 sm:py-16">
-          <SectionHeader title="مهما كان نوع شغلك ليك مكان" body="اختار نوع نشاطك وانت بتفتح المتجر، والتطبيق بيجهّزلك طريقة عرض المنتجات اللي تناسبه." />
+          <SectionHeader title="مهما كان نوع شغلك ليك مكان" body="اختار نوع نشاطك وانت بتفتح المتجر، وفاترينة بتجهّزلك طريقة عرض المنتجات اللي تناسبه." />
           <StoreTypeFronts counts={storeCounts} />
         </Container>
       </section>
@@ -118,7 +121,7 @@ export default async function SellPage() {
       {/* Steps */}
       <section className="border-y border-line">
         <Container className="py-12 sm:py-16">
-          <SectionHeader title="تبدأ إزاي" body="أربع خطوات من التحميل لأول طلب." />
+          <SectionHeader title="تبدأ إزاي" body="أربع خطوات من التسجيل لأول طلب." />
           <ol className="grid lg:grid-cols-4 lg:gap-6">
             {STEPS.map((s, i) => (
               <li key={s.title} className="group flex gap-4 lg:flex-col">
@@ -165,8 +168,11 @@ export default async function SellPage() {
               <h2 className="text-section font-extrabold sm:text-page">جاهز تفتح فاترينتك؟</h2>
               <p className="mt-1 max-w-xl text-ink-2">افتح النهارده ببلاش، ومتجرك يبقى قدام العملاء بعد المراجعة.</p>
               <div className="mt-5 flex flex-wrap items-center gap-3">
-                <OpenInApp path={appPath.sell} className="min-h-12 px-6 text-body">
-                  افتح متجرك من التطبيق
+                <Link href="/seller/apply" className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent px-6 text-body font-bold text-on-accent transition-colors hover:bg-accent-hover">
+                  افتح متجرك
+                </Link>
+                <OpenInApp path={appPath.sell} variant="secondary" className="min-h-12 px-6 text-body">
+                  أو من التطبيق
                 </OpenInApp>
                 <Link
                   href="/contact"

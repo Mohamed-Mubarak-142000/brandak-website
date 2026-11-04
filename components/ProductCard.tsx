@@ -6,6 +6,7 @@ import { discountPercent, num, originalPrice, price } from '@/lib/format';
 import type { ProductCard as Product } from '@/lib/types';
 
 import { Rating } from './Rating';
+import { WishlistButton } from './WishlistButton';
 
 /**
  * A product tile: big square photo with the discount on it, then store, title, price.
@@ -16,7 +17,9 @@ export function ProductCard({ product, priority }: { product: Product; priority?
   const before = originalPrice(product);
   const lowestTier = product.wholesale?.tiers?.length ? product.wholesale.tiers.reduce((a, b) => (b.price < a.price ? b : a)) : null;
 
+  // The heart sits beside the link, not inside it: a button can't live in an <a>.
   return (
+    <div className="relative h-full min-w-0">
     <Link
       href={`/product/${product.id}`}
       className="group flex h-full min-w-0 flex-col overflow-hidden rounded-card border border-line bg-surface transition-[border-color,box-shadow] duration-200 hover:border-line-strong hover:shadow-card"
@@ -34,8 +37,8 @@ export function ProductCard({ product, priority }: { product: Product; priority?
         ) : (
           <Package aria-hidden className="absolute inset-0 m-auto size-10 text-ink-3" />
         )}
-        <div className="absolute inset-x-2 top-2 flex items-start justify-between gap-2">
-          {off ? <span className="rounded-full bg-danger px-2 py-0.5 text-meta font-bold text-white">خصم {num(off)}٪</span> : <span />}
+        <div className="absolute end-2 top-2 flex flex-col items-end gap-1">
+          {off ? <span className="rounded-full bg-danger px-2 py-0.5 text-meta font-bold text-white">خصم {num(off)}٪</span> : null}
           {product.sponsored ? <span className="rounded-full bg-surface/90 px-2 py-0.5 text-meta text-ink-2">مُموَّل</span> : null}
         </div>
         {!product.inStock ? (
@@ -67,6 +70,8 @@ export function ProductCard({ product, priority }: { product: Product; priority?
         <Rating avg={product.ratingAvg} count={product.ratingCount} />
       </div>
     </Link>
+    <WishlistButton productId={product.id} title={product.title} className="absolute start-2 top-2 z-10" />
+    </div>
   );
 }
 

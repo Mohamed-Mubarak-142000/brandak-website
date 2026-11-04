@@ -62,7 +62,7 @@ export function Footer({ categories }: { categories: Category[] }) {
             <Image src="/brand/fatrina-mark.png" alt="" width={40} height={40} />
             <span className="font-sign text-page text-brand">فاترينة</span>
           </Link>
-          <p className="mt-3 max-w-xs text-ui text-ink-2">براندات ومعارض ومخازن ومحلات مصرية في مكان واحد. تصفّح هنا، واطلب من التطبيق.</p>
+          <p className="mt-3 max-w-xs text-ui text-ink-2">براندات ومعارض ومخازن ومحلات مصرية في مكان واحد. اطلب هنا على الموقع أو من التطبيق.</p>
           <div className="mt-5 flex items-center gap-4 rounded-panel bg-surface p-3 shadow-card">
             <QrCode value={PLAY_URL} size={84} label="امسح الكود عشان تحمّل التطبيق من Google Play" />
             <div>

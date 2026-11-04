@@ -4,8 +4,8 @@ import { SectionHeader } from '@/components/SectionHeader';
 import { num } from '@/lib/format';
 
 const STEPS = [
-  { art: 'onboarding-discover', title: 'اتفرّج واختار', body: 'دوّر على المنتج أو اتفرّج على فاترينات المتاجر هنا أو في التطبيق.' },
-  { art: 'onboarding-shop', title: 'اطلب من التطبيق', body: 'اختار المقاس أو الكمية واكتب عنوانك، وهتعرف مصاريف الشحن قبل ما تأكّد.' },
+  { art: 'onboarding-discover', title: 'اكتشف', body: 'دوّر على المنتج أو اتفرّج على فاترينات المتاجر هنا أو في التطبيق.' },
+  { art: 'onboarding-shop', title: 'أضف للسلة واطلب', body: 'اختار المقاس أو الكمية وضيفه للسلة، واكتب عنوانك. هتعرف مصاريف الشحن قبل ما تأكّد، هنا أو من التطبيق.' },
   { art: 'onboarding-delivery', title: 'استلم وادفع كاش', body: 'المتجر بيجهّز طلبك ويبعته، وانت بتدفع للمندوب لما يوصلك.' },
 ];
 

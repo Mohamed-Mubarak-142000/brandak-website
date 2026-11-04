@@ -166,3 +166,151 @@ export interface CommissionTerms {
   settlementDays: number;
   maxUnpaidBalance: number;
 }
+
+// ---------- Account (signed-in customer) ----------
+// Copied from `brandak app/src/api/types.ts`; keep in step.
+
+export type OrderStatus = 'AWAITING_CONFIRMATION' | 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'REFUSED';
+export type BrandStatus = 'PENDING_REVIEW' | 'ACTIVE' | 'REJECTED' | 'SUSPENDED';
+
+export interface PublicUser {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  roles: ('CUSTOMER' | 'SUPER_ADMIN')[];
+  status: 'ACTIVE' | 'SUSPENDED';
+  emailVerified: boolean;
+  phoneVerified: boolean;
+  createdAt: ISODate;
+}
+/** `users/me`: the user plus the store they own, if any. */
+export interface Me extends PublicUser {
+  brand: { id: string; role: 'OWNER' } | null;
+}
+export interface AuthResult {
+  user: PublicUser;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface Address {
+  id: string;
+  label: string;
+  recipientName: string;
+  phone: string;
+  governorate: string;
+  governorateName: string;
+  city: string;
+  area: string;
+  street: string;
+  building: string;
+  floor: string;
+  apartment: string;
+  landmark: string;
+  location: { lat: number; lng: number } | null;
+  isDefault: boolean;
+}
+
+// ---------- Cart & checkout ----------
+export interface CartBrand {
+  id: string;
+  name: string;
+  slug: string;
+  logoUrl: string | null;
+}
+export interface CartSummary {
+  brand: CartBrand;
+  itemsCount: number;
+  updatedAt: ISODate;
+}
+/** BELOW_MIN_QTY: a wholesale product with fewer pieces than its minimum (all sizes together). */
+export type LineIssue = 'UNAVAILABLE' | 'OUT_OF_STOCK' | 'INSUFFICIENT_STOCK' | 'BELOW_MIN_QTY';
+export interface PricedLine {
+  itemId: string;
+  productId: string;
+  variantId: string;
+  title: string;
+  imageUrl: string | null;
+  size: string | null;
+  color: string | null;
+  sku: string | null;
+  unitPrice: number;
+  quantity: number;
+  lineTotal: number;
+  available: number;
+  minQty?: number;
+  issue: LineIssue | null;
+}
+export interface CartView {
+  brand: CartBrand;
+  acceptingOrders: boolean;
+  items: PricedLine[];
+  subtotal: number;
+  hasIssues: boolean;
+}
+export interface Quote {
+  items: PricedLine[];
+  subtotal: number;
+  shippingFee: number;
+  discountTotal: number;
+  grandTotal: number;
+  coupon?: { code: string; discount: number } | null;
+  currency: 'EGP';
+  paymentMethods: ['COD'];
+  points?: { balance: number; usable: number; usableDiscount: number; used: number; discount: number } | null;
+  fulfillment?: 'DELIVERY' | 'PICKUP';
+}
+
+// ---------- Orders ----------
+export interface OrderSummary {
+  id: string;
+  orderNumber: string;
+  brand: { id: string; name: string; slug: string; phone?: string };
+  status: OrderStatus;
+  statusLabelAr: string;
+  itemsCount: number;
+  grandTotal: number;
+  currency: string;
+  paymentMethod: 'COD';
+  paymentStatus: 'UNPAID' | 'PAID';
+  createdAt: ISODate;
+  previewImageUrl?: string | null;
+}
+export interface OrderItem {
+  productId: string;
+  variantId: string;
+  title: string;
+  imageUrl?: string;
+  size?: string;
+  color?: string;
+  unitPrice: number;
+  quantity: number;
+  lineTotal: number;
+}
+export interface OrderDetail extends Omit<OrderSummary, 'previewImageUrl'> {
+  items: OrderItem[];
+  /** null for orders collected from the store. */
+  address: Address | null;
+  fulfillment?: 'DELIVERY' | 'PICKUP';
+  points?: { used: number; discount: number; earned: number } | null;
+  gift?: { message: string; hidePrices: boolean } | null;
+  pickup?: { address: string; governorate: string | null; hours: string; mapUrl: string } | null;
+  subtotal: number;
+  shippingFee: number;
+  discountTotal: number;
+  notes: string;
+  cancelReason: string | null;
+  deliveredAt: ISODate | null;
+  history: { status: OrderStatus; at: ISODate; actor: 'CUSTOMER' | 'BRAND' | 'ADMIN' | 'SYSTEM'; note: string | null }[];
+  allowedNextStatuses: OrderStatus[];
+  coupon?: { code: string; discount: number; fundedBy: 'BRAND' | 'PLATFORM' } | null;
+  shipment?: { carrier: string; trackingNumber: string; trackingUrl: string | null; shippedAt: ISODate } | null;
+}
+
+export interface WishlistItem {
+  productId: string;
+  addedAt: ISODate;
+  available: boolean;
+  product: ProductCard | null;
+}

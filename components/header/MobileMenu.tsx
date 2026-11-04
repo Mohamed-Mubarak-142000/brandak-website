@@ -131,6 +131,9 @@ export function MobileMenu({ sections }: { sections: MenuSection[] }) {
                 العروض والخصومات
               </Link>
               {[
+                { href: '/account', label: 'حسابي' },
+                { href: '/account/orders', label: 'طلباتي' },
+                { href: '/cart', label: 'السلة' },
                 { href: '/sell', label: 'ابدأ البيع على فاترينة' },
                 { href: '/about', label: 'من نحن' },
                 { href: '/faq', label: 'الأسئلة الشائعة' },

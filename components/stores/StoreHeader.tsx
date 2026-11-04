@@ -2,6 +2,7 @@ import { Clock, Globe, Package, Truck } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { FollowButton } from '@/components/FollowButton';
 import { OpenInApp } from '@/components/OpenInApp';
 import { Rating } from '@/components/Rating';
 import { StoreLogo } from '@/components/StoreCard';
@@ -112,8 +113,9 @@ export function StoreHeader({ store, productCount }: { store: PublicBrand; produ
             <Rating avg={store.ratingAvg} count={store.ratingCount} className="mt-1 text-ui" />
           </div>
           <div className="flex flex-wrap items-center gap-2 md:mb-1">
-            <OpenInApp path={appPath.brand(store.slug)} className="px-6">
-              تابع المتجر في التطبيق
+            <FollowButton brandId={store.id} />
+            <OpenInApp path={appPath.brand(store.slug)} variant="secondary" className="px-5">
+              افتح في التطبيق
             </OpenInApp>
             <SocialLinks store={store} />
           </div>

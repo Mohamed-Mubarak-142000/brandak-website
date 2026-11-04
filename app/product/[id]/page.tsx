@@ -179,7 +179,7 @@ export default async function ProductPage({ params }: Props) {
         </div>
       </Container>
 
-      <StickyOrderBar product={product} />
+      <StickyOrderBar product={product} acceptsOrders={store?.shipping?.acceptsOrders ?? true} />
     </>
   );
 }

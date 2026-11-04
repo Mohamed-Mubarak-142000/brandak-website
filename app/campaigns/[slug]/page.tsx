@@ -76,8 +76,8 @@ export default async function CampaignPage({ params, searchParams }: Props) {
                 ) : null}
               </div>
             </div>
-            <OpenInApp path={appPath.offers} className="shrink-0 self-start sm:self-auto">
-              كوبونات التطبيق
+            <OpenInApp path={appPath.offers} variant="secondary" className="shrink-0 self-start sm:self-auto">
+              افتح العروض في التطبيق
             </OpenInApp>
           </div>
         </Container>

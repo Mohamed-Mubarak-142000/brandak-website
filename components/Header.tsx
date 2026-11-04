@@ -6,6 +6,7 @@ import { STORE_TYPES } from '@/lib/store-types';
 import type { Category } from '@/lib/types';
 
 import { Container } from './Container';
+import { AccountNav } from './header/AccountNav';
 import { HeaderShell, NavLink } from './header/HeaderParts';
 import { MobileMenu } from './header/MobileMenu';
 import { ShopMenu, type MenuSection } from './header/ShopMenu';
@@ -76,11 +77,13 @@ export function Header({ categories }: { categories: Category[] }) {
 
         <SearchForm className="hidden flex-1 md:block lg:mx-6" />
 
-        <OpenInApp path="" className="ms-auto min-h-10 px-4 text-ui md:ms-0">
-          <Smartphone aria-hidden className="size-4" />
-          <span className="hidden sm:inline">حمّل التطبيق</span>
-          <span className="sm:hidden">التطبيق</span>
-        </OpenInApp>
+        <div className="ms-auto flex items-center gap-2 md:ms-0">
+          <OpenInApp path="" variant="secondary" className="hidden min-h-10 px-4 text-ui xl:inline-flex">
+            <Smartphone aria-hidden className="size-4" />
+            حمّل التطبيق
+          </OpenInApp>
+          <AccountNav />
+        </div>
       </Container>
 
       {/* Phones: search gets its own row */}

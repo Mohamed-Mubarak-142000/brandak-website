@@ -25,7 +25,7 @@ const lalezar = Lalezar({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: 'فاترينة | براندات ومعارض ومخازن ومحلات مصر في مكان واحد', template: '%s | فاترينة' },
-  description: 'تسوّق من براندات ومعارض ومخازن ومحلات مصرية في مكان واحد. أسعار واضحة، توصيل لكل المحافظات، والدفع كاش عند الاستلام.',
+  description: 'تسوّق من براندات ومعارض ومخازن ومحلات مصرية في مكان واحد. اطلب من الموقع أو من التطبيق، أسعار واضحة، توصيل لكل المحافظات، والدفع كاش عند الاستلام.',
   applicationName: 'فاترينة',
   openGraph: { type: 'website', locale: 'ar_EG', siteName: 'فاترينة' },
   twitter: { card: 'summary_large_image' },

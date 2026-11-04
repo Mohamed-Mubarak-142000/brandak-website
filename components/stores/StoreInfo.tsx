@@ -52,7 +52,7 @@ function ZoneList({ zones, governorates }: { zones: PublicBrand['shipping']['zon
 /** Delivery, returns and pickup — what a shopper checks before ordering. A single column for the side card. */
 export function StoreInfo({ store, governorates }: { store: PublicBrand; governorates: Governorate[] }) {
   const s = store.shipping;
-  if (!s) return <p className="text-ui text-ink-2">مصاريف الشحن وشروط الاسترجاع بتظهر في التطبيق.</p>;
+  if (!s) return <p className="text-ui text-ink-2">مصاريف الشحن وشروط الاسترجاع بتظهرلك قبل ما تأكد الطلب.</p>;
   const zones = s.zones ?? [];
   const returnDays = s.returnDays;
   const pickup = s.pickup?.enabled ? s.pickup : null;
@@ -64,7 +64,7 @@ export function StoreInfo({ store, governorates }: { store: PublicBrand; governo
       {!s.acceptsOrders ? (
         <p className="mb-4 flex items-start gap-2 rounded-card bg-warning-soft p-3 text-ui font-semibold text-warning">
           <AlertCircle aria-hidden className="mt-0.5 size-4 shrink-0" />
-          المتجر مش بيستقبل طلبات دلوقتي. تابعه من التطبيق ويوصلك لما يرجع.
+          المتجر مش بيستقبل طلبات دلوقتي. تابعه ويوصلك إشعار لما يرجع.
         </p>
       ) : null}
 
@@ -85,7 +85,7 @@ export function StoreInfo({ store, governorates }: { store: PublicBrand; governo
               لكل المحافظات: <span className="font-semibold text-ink">{fee(s.defaultFee)}</span>
             </p>
           ) : (
-            <p>مصاريف الشحن بتظهر في التطبيق لما تكتب عنوانك.</p>
+            <p>مصاريف الشحن بتظهرلك لما تختار عنوانك في إتمام الطلب.</p>
           )}
           {s.freeShippingThreshold ? <p className="mt-2 rounded-md bg-success-soft px-2 py-1 font-semibold text-success">شحن مجاني للطلبات من {price(s.freeShippingThreshold)}</p> : null}
           {shippingPolicy ? (
@@ -101,7 +101,7 @@ export function StoreInfo({ store, governorates }: { store: PublicBrand; governo
         </Row>
 
         <Row icon={RotateCcw} title="الاسترجاع">
-          {returnDays === 0 ? 'مفيش استرجاع في المتجر ده.' : returnDays ? `تقدر تطلب استرجاع خلال ${days(returnDays)} من الاستلام.` : 'شروط الاسترجاع مكتوبة في التطبيق.'}
+          {returnDays === 0 ? 'مفيش استرجاع في المتجر ده.' : returnDays ? `تقدر تطلب استرجاع خلال ${days(returnDays)} من الاستلام.` : 'اسأل المتجر عن شروط الاسترجاع قبل ما تطلب.'}
           {returnPolicy ? (
             <details>
               <summary className={more}>سياسة الاسترجاع</summary>

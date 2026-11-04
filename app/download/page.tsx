@@ -11,7 +11,7 @@ import { PLAY_URL } from '@/lib/links';
 
 export const metadata: Metadata = {
   title: 'حمّل تطبيق فاترينة',
-  description: 'حمّل فاترينة ببلاش من Google Play: براندات ومعارض ومخازن ومحلات مصرية في مكان واحد، والدفع كاش عند الاستلام.',
+  description: 'حمّل فاترينة ببلاش من Google Play: إشعارات فورية بحالة طلبك، تنبيهات الأسعار، المرتجعات والتقييمات، والدفع كاش عند الاستلام.',
   alternates: { canonical: '/download' },
 };
 
@@ -29,7 +29,7 @@ const SCREENS = [
 const FEATURED = [SCREENS[1], SCREENS[3], SCREENS[5]];
 
 const PROMISES = [
-  { icon: Check, text: 'التطبيق ببلاش، والتصفح من غير حساب' },
+  { icon: Check, text: 'ببلاش، ونفس حسابك على الموقع' },
   { icon: Banknote, text: 'الدفع كاش لما الطلب يوصلك' },
   { icon: Truck, text: 'شحن لكل محافظات مصر' },
   { icon: ShieldCheck, text: 'متاجر متراجعة وتقييمات من ناس اشترت' },
@@ -62,7 +62,7 @@ export default async function DownloadPage({ searchParams }: { searchParams: Pro
           <h1 className="text-page font-extrabold sm:text-display">حمّل فاترينة على موبايلك</h1>
           <p className="mt-3 max-w-xl text-body text-ink-2 sm:text-section sm:leading-relaxed">
             {/* Only Android opens the exact screen; the QR elsewhere goes straight to Google Play. */}
-            {(android && note) || 'براندات ومعارض ومخازن ومحلات مصرية في مكان واحد. اطلب وادفع كاش لما الطلب يوصلك.'}
+            {(android && note) || 'نفس الطلب اللي بتعمله هنا، ومعاه إشعار فوري بحالة طلبك، وتنبيه لما السعر ينزل، والمرتجعات والشكاوى والتقييمات و«بيع واكسب». والدفع كاش لما الطلب يوصلك.'}
           </p>
 
           <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">

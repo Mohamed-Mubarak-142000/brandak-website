@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const store = await getBrand(slug);
   if (!store) return { title: 'المتجر مش موجود' };
   const info = storeTypeInfo(store.storeType);
-  const description = excerpt(store.description ?? '') || `${info.label} على فاترينة: اتفرّج على منتجاته واطلب من التطبيق، والدفع عند الاستلام.`;
+  const description = excerpt(store.description ?? '') || `${info.label} على فاترينة: اتفرّج على منتجاته واطلب منه هنا أو من التطبيق، والدفع عند الاستلام.`;
   const image = store.coverUrl ?? store.logoUrl;
   return {
     title: `${store.name} (${info.label})`,
@@ -144,7 +144,7 @@ export default async function StorePage({ params, searchParams }: Props) {
             <EmptyState
               art="box"
               title="المتجر لسه بيرصّ فاترينته"
-              body="مفيش منتجات معروضة دلوقتي. تابع المتجر من التطبيق ويوصلك إشعار أول ما ينزّل منتجات."
+              body="مفيش منتجات معروضة دلوقتي. تابع المتجر ويوصلك إشعار أول ما ينزّل منتجات."
               action={
                 <OpenInApp path={appPath.brand(store.slug)} variant="secondary">
                   تابع المتجر في التطبيق
@@ -161,9 +161,9 @@ export default async function StorePage({ params, searchParams }: Props) {
                 التوصيل والاسترجاع
               </h2>
               <StoreInfo store={store} governorates={governorates} />
-              <OpenInApp path={appPath.brand(store.slug)} className="mt-5 w-full">
-                اطلب من التطبيق
-              </OpenInApp>
+              <a href="#products" className="mt-5 flex min-h-11 w-full items-center justify-center rounded-full bg-accent px-5 font-bold text-on-accent transition-colors hover:bg-accent-hover">
+                تسوّق من المتجر
+              </a>
             </section>
             <StoreTypePanel type={store.storeType} />
           </div>

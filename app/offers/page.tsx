@@ -41,11 +41,11 @@ export default async function OffersPage({ searchParams }: { searchParams: Promi
           </p>
           <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
             <OpenInApp path={appPath.offers} className="min-h-12 px-6">
-              شوف عروض التطبيق
+              عروض التطبيق
             </OpenInApp>
             <p className="flex items-start gap-2 text-ui font-semibold text-ink-2">
               <Coins aria-hidden className="mt-0.5 size-4 shrink-0 text-accent" />
-              كوبونات المتاجر ونقاط فاترينة في التطبيق بس.
+              كوبونات المتاجر ونقاط فاترينة بتستخدمها وانت بتأكد الطلب، هنا على الموقع أو في التطبيق.
             </p>
           </div>
         </div>
@@ -86,7 +86,7 @@ export default async function OffersPage({ searchParams }: { searchParams: Promi
             <EmptyState
               art="box"
               title={page > 1 ? 'مفيش عروض تانية' : 'مفيش خصومات شغالة دلوقتي'}
-              body="المتاجر بتنزّل خصومات كل فترة، وفي التطبيق كوبونات ونقاط تقدر تستخدمها في أي وقت."
+              body="المتاجر بتنزّل خصومات كل فترة، وكوبونات المتاجر ونقاط فاترينة تقدر تستخدمها في أي طلب، هنا أو في التطبيق."
               action={
                 <>
                   <Link href="/search" className="inline-flex min-h-11 items-center rounded-full bg-accent px-5 font-bold text-on-accent transition-colors hover:bg-accent-hover">
@@ -94,7 +94,7 @@ export default async function OffersPage({ searchParams }: { searchParams: Promi
                   </Link>
                   <OpenInApp path={appPath.offers} variant="secondary">
                     <TicketPercent aria-hidden className="size-4" />
-                    كوبونات التطبيق
+                    افتح العروض في التطبيق
                   </OpenInApp>
                 </>
               }

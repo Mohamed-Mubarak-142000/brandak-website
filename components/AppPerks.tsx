@@ -1,24 +1,24 @@
-import { BadgePercent, Bell, Coins, PackageCheck } from 'lucide-react';
+import { Bell, BellRing, RotateCcw, TrendingDown } from 'lucide-react';
 import Image from 'next/image';
 
 import { OpenInApp } from './OpenInApp';
 
 const PERKS = [
-  { icon: PackageCheck, title: 'تتبّع طلبك خطوة بخطوة', body: 'من التأكيد لحد ما يوصل بابك، مع إشعار في كل خطوة.' },
-  { icon: Coins, title: 'نقاط على كل طلب', body: 'كل ١٠ ج.م بنقطة، وتصرفها خصم في أي متجر.' },
-  { icon: BadgePercent, title: 'كوبونات وعروض التطبيق', body: 'أكواد خصم من المتاجر وعروض المواسم.' },
-  { icon: Bell, title: 'تابع متاجرك', body: 'يوصلك الجديد والعروض، وتنبيه لما السعر ينزل.' },
+  { icon: BellRing, title: 'إشعار فوري بحالة طلبك', body: 'من التأكيد للشحن لحد ما يوصل بابك، يوصلك إشعار في كل خطوة.' },
+  { icon: RotateCcw, title: 'مرتجعات وشكاوى وتقييمات', body: 'ترجّع منتج أو تفتح شكوى أو تقيّم اللي استلمته من صفحة الطلب.' },
+  { icon: TrendingDown, title: 'تنبيه لما السعر ينزل', body: 'وتنبيه لما المقاس اللي عايزه يرجع.' },
+  { icon: Bell, title: 'تابع متاجرك', body: 'يوصلك الجديد والعروض أول بأول.' },
 ];
 
 /**
- * What only the app gives — the reason to install. Full on the home page; compact under product
- * and store pages.
+ * What the app adds on top of ordering here — the reason to install. Full on the home page;
+ * compact under product and store pages.
  */
 export function AppPerks({ compact, path = '' }: { compact?: boolean; path?: string }) {
   if (compact) {
     return (
       <section className="rounded-panel border border-line bg-surface p-5 sm:p-6">
-        <h2 className="text-body font-extrabold">الطلب من التطبيق بيكسّبك أكتر</h2>
+        <h2 className="text-body font-extrabold">حمّل التطبيق عشان تتابع أسرع</h2>
         <ul className="mt-4 grid gap-3 sm:grid-cols-2">
           {PERKS.map(({ icon: Icon, title }) => (
             <li key={title} className="flex items-center gap-3">
@@ -39,8 +39,8 @@ export function AppPerks({ compact, path = '' }: { compact?: boolean; path?: str
   return (
     <section className="grid items-center gap-8 overflow-hidden rounded-window bg-sunken p-6 sm:p-10 lg:grid-cols-[1.4fr_1fr]">
       <div>
-        <h2 className="text-page font-extrabold sm:text-display">الطلب من التطبيق بيكسّبك أكتر</h2>
-        <p className="mt-2 max-w-xl text-ink-2">التصفح هنا ببلاش ومن غير حساب. ولما تحب تطلب، التطبيق بيديك مزايا مش موجودة في أي مكان تاني.</p>
+        <h2 className="text-page font-extrabold sm:text-display">حمّل التطبيق عشان تتابع أسرع</h2>
+        <p className="mt-2 max-w-xl text-ink-2">تقدر تطلب هنا على الموقع أو من التطبيق بنفس الحساب. والتطبيق بيزوّدك إشعارات فورية وتنبيهات للأسعار، ومنه ترجّع أو تشتكي أو تقيّم.</p>
         <ul className="mt-7 grid gap-5 sm:grid-cols-2">
           {PERKS.map(({ icon: Icon, title, body }) => (
             <li key={title} className="flex gap-3">
