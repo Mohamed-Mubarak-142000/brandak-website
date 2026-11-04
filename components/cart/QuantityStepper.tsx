@@ -19,6 +19,7 @@ export function QuantityStepper({
   onRemove,
   label = 'الكمية',
   size = 'md',
+  block,
 }: {
   value: number;
   onChange: (n: number) => void;
@@ -28,6 +29,8 @@ export function QuantityStepper({
   onRemove?: () => void;
   label?: string;
   size?: 'sm' | 'md';
+  /** Stretch to the parent's full width, the buttons at the two ends. */
+  block?: boolean;
 }) {
   const [draft, setDraft] = useState<string | null>(null);
   const clamp = (n: number) => Math.max(min, Math.min(max, Math.round(n)));
@@ -44,7 +47,7 @@ export function QuantityStepper({
   const atMin = value <= min;
 
   return (
-    <div role="group" aria-label={label} className={cn('inline-flex items-center rounded-full border border-line-strong bg-surface', disabled && 'opacity-60')}>
+    <div role="group" aria-label={label} className={cn(block ? 'flex w-full' : 'inline-flex', 'items-center rounded-full border border-line-strong bg-surface', disabled && 'opacity-60')}>
       {/* Plus sits first: in RTL that's the right-hand side, like the app. */}
       <button type="button" className={btn} onClick={() => onChange(clamp(value + 1))} disabled={disabled || value >= max} aria-label="زوّد واحد">
         <Plus aria-hidden className="size-4" />
@@ -63,7 +66,7 @@ export function QuantityStepper({
             commit();
           }
         }}
-        className={cn('w-12 bg-transparent text-center font-bold tabular-nums outline-none', size === 'sm' ? 'text-ui' : 'text-body')}
+        className={cn(block ? 'min-w-0 flex-1' : 'w-12', 'bg-transparent text-center font-bold tabular-nums outline-none', size === 'sm' ? 'text-ui' : 'text-body')}
       />
       {onRemove && atMin ? (
         <button type="button" className={cn(btn, 'text-danger')} onClick={onRemove} disabled={disabled} aria-label="شيل من السلة">

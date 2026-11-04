@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2, ShoppingBag, X } from 'lucide-react';
+import { Loader2, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
@@ -8,14 +8,13 @@ import { useRef, useState } from 'react';
 import { useDismiss } from '@/components/header/useDismiss';
 import { shopError } from '@/components/checkout/errors';
 import { api } from '@/lib/client-api';
-import { cn } from '@/lib/cn';
 import type { ProductCard, ProductDetail, Variant } from '@/lib/types';
 
 import { cartLines, useCartLines } from './cartLines';
 import { QuantityStepper } from './QuantityStepper';
+import { VariantPicker } from './VariantPicker';
 
 const buyable = (v: Variant) => v.inStock && v.available > 0;
-const variantLabel = (v: Variant) => [v.size, v.color].filter(Boolean).join(' · ') || 'المتاح';
 
 /**
  * "أضف للسلة" on a product card. Once the product is in the cart it becomes − n +, and − at one
@@ -29,6 +28,7 @@ export function CardCartControl({ product }: { product: ProductCard }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [choices, setChoices] = useState<Variant[] | null>(null);
+  const [openCount, setOpenCount] = useState(0);
   const wrap = useRef<HTMLDivElement>(null);
   const [pickerOpen, setPickerOpen] = useDismiss(wrap);
   const minQty = product.wholesale?.minQty && product.wholesale.minQty > 1 ? product.wholesale.minQty : 1;
@@ -63,6 +63,7 @@ export function CardCartControl({ product }: { product: ProductCard }) {
       if (options.length === 1) {
         await cartLines.add(product.id, product.brand.id, options[0].id, Math.min(minQty, Math.max(1, options[0].available)));
       } else {
+        setOpenCount((n) => n + 1);
         setPickerOpen(true);
       }
     });
@@ -73,9 +74,10 @@ export function CardCartControl({ product }: { product: ProductCard }) {
     const line = lines[0];
     const max = Math.max(line.quantity, line.available || line.quantity);
     return (
-      <div className="flex items-center justify-between gap-2">
+      <div className="relative flex flex-col gap-1">
         <QuantityStepper
           size="sm"
+          block
           value={line.quantity}
           min={1}
           max={max}
@@ -84,7 +86,7 @@ export function CardCartControl({ product }: { product: ProductCard }) {
           onChange={(n) => run(() => cartLines.setQuantity(line, n))}
           onRemove={() => run(() => cartLines.remove(line))}
         />
-        {busy ? <Loader2 aria-hidden className="size-4 animate-spin text-ink-3" /> : null}
+        {busy ? <Loader2 aria-hidden className="pointer-events-none absolute top-3 start-[calc(50%+1.25rem)] size-4 animate-spin text-ink-3" /> : null}
         {error ? <p role="alert" className="text-meta text-danger">{error}</p> : null}
       </div>
     );
@@ -118,28 +120,14 @@ export function CardCartControl({ product }: { product: ProductCard }) {
       {error ? <p role="alert" className="mt-1 text-meta text-danger">{error}</p> : null}
 
       {pickerOpen && choices && choices.length > 1 ? (
-        <div role="dialog" aria-label={`اختار من ${product.title}`} className="absolute inset-x-0 bottom-full z-20 mb-2 rounded-panel border border-line bg-surface p-3 shadow-pop">
-          <div className="mb-2 flex items-center justify-between">
-            <p className="text-meta font-bold">اختار المقاس أو اللون</p>
-            <button type="button" onClick={() => setPickerOpen(false)} aria-label="اقفل" className="-m-2 grid size-9 cursor-pointer place-items-center rounded-full hover:bg-sunken">
-              <X aria-hidden className="size-4" />
-            </button>
-          </div>
-          <ul className="flex max-h-44 flex-wrap gap-1.5 overflow-y-auto">
-            {choices.map((v) => (
-              <li key={v.id}>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => add(v)}
-                  className={cn('min-h-9 cursor-pointer rounded-full border border-line-strong px-3 text-meta font-semibold transition-colors hover:border-brand hover:text-accent', busy && 'opacity-60')}
-                >
-                  {variantLabel(v)}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <VariantPicker
+          key={openCount}
+          title={product.title}
+          variants={choices}
+          busy={busy}
+          onAdd={add}
+          onClose={() => setPickerOpen(false)}
+        />
       ) : null}
     </div>
   );

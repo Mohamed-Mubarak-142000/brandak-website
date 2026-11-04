@@ -29,6 +29,7 @@ export interface ChatPanelProps {
 }
 
 const MAX = 500;
+const MOBILE = '(max-width: 639.98px)';
 const chip = 'inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border border-line-strong bg-surface px-4 text-ui font-bold text-ink transition-colors hover:border-brand';
 
 export function ChatPanel({ slug, name, greeting, suggestions, productId, whatsapp, store, open, onClose, onDisabled }: ChatPanelProps) {
@@ -41,9 +42,27 @@ export function ChatPanel({ slug, name, greeting, suggestions, productId, whatsa
   const titleId = useId();
   const pathname = usePathname();
 
-  // Focus the box whenever the window opens.
+  // Focus the box whenever the window opens — on desktop only. On phones it would pop the keyboard
+  // over the greeting/suggestions before the visitor has read them.
   useEffect(() => {
-    if (open) inputRef.current?.focus();
+    if (open && !window.matchMedia(MOBILE).matches) inputRef.current?.focus();
+  }, [open]);
+
+  // iOS Safari doesn't shrink the layout when the keyboard opens, so a `fixed inset-0` panel ends up
+  // with its composer under the keyboard. Size the full-screen panel to the visible viewport instead.
+  const [viewport, setViewport] = useState<{ top: number; height: number } | null>(null);
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!open || !vv || !window.matchMedia(MOBILE).matches) return;
+    const sync = () => setViewport({ top: vv.offsetTop, height: vv.height });
+    sync();
+    vv.addEventListener('resize', sync);
+    vv.addEventListener('scroll', sync);
+    return () => {
+      vv.removeEventListener('resize', sync);
+      vv.removeEventListener('scroll', sync);
+      setViewport(null);
+    };
   }, [open]);
 
   // Escape closes the menu first, then the window.
@@ -91,8 +110,9 @@ export function ChatPanel({ slug, name, greeting, suggestions, productId, whatsa
       role="dialog"
       aria-labelledby={titleId}
       hidden={!open}
+      style={viewport ? { top: viewport.top, height: viewport.height, bottom: 'auto' } : undefined}
       className={cn(
-        'fixed top-0 bottom-0 start-0 end-0 z-50 flex flex-col bg-surface',
+        'fixed top-0 bottom-0 start-0 end-0 z-50 flex flex-col overflow-hidden bg-surface',
         'sm:top-auto sm:end-auto sm:bottom-6 sm:start-6 sm:h-[min(600px,calc(100dvh-3rem))] sm:w-[400px] sm:overflow-hidden sm:rounded-window sm:border sm:border-line sm:shadow-pop',
       )}
     >
@@ -222,7 +242,7 @@ export function ChatPanel({ slug, name, greeting, suggestions, productId, whatsa
             rows={1}
             disabled={!!blocked}
             placeholder={blocked ? 'مينفعش تبعت رسايل دلوقتي' : 'اكتب سؤالك…'}
-            className="field-sizing-content max-h-32 min-h-11 flex-1 resize-none rounded-card border border-line-strong bg-surface px-3 py-2.5 text-ui leading-normal outline-none placeholder:text-ink-3 focus-visible:border-brand disabled:bg-sunken"
+            className="field-sizing-content max-h-32 min-h-11 flex-1 resize-none rounded-card border border-line-strong bg-surface px-3 py-2.5 text-base leading-normal sm:text-ui outline-none placeholder:text-ink-3 focus-visible:border-brand disabled:bg-sunken"
           />
           <button
             type="submit"
