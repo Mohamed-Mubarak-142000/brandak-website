@@ -18,7 +18,7 @@ export default function DeleteAccountPage() {
     <LegalArticle doc={DELETE_ACCOUNT} current="/delete-account" updated={LEGAL_UPDATED} fill={(s) => s.replaceAll('{email}', SUPPORT_EMAIL)}>
       <a
         href={mailto}
-        className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full border border-line-strong bg-surface px-5 font-bold hover:border-brand"
+        className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-full bg-accent px-6 font-bold text-on-accent transition-colors hover:bg-accent-hover"
       >
         <Mail aria-hidden className="size-5" />
         ابعت طلب حذف بالإيميل

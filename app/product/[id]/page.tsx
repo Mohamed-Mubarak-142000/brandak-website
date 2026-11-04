@@ -1,28 +1,23 @@
-import { CalendarClock, CircleCheck, CircleX, Store } from 'lucide-react';
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { AppPerks } from '@/components/AppPerks';
 import { Breadcrumbs, type Crumb } from '@/components/catalog/Breadcrumbs';
 import { Container } from '@/components/Container';
-import { OpenInApp } from '@/components/OpenInApp';
-import { Price } from '@/components/Price';
 import { DeliveryInfo } from '@/components/product/DeliveryInfo';
 import { Gallery } from '@/components/product/Gallery';
-import { ProductOptions } from '@/components/product/ProductOptions';
+import { ProductTabs, type ProductTab } from '@/components/product/ProductTabs';
+import { PurchaseCard } from '@/components/product/PurchaseCard';
 import { Reviews } from '@/components/product/Reviews';
-import { SpecsTable } from '@/components/product/Specs';
+import { specRows, SpecsTable } from '@/components/product/Specs';
 import { StickyOrderBar } from '@/components/product/StickyOrderBar';
-import { StoreTypeDetails } from '@/components/product/StoreTypeDetails';
 import { ProductGrid } from '@/components/ProductCard';
-import { Rating } from '@/components/Rating';
 import { SectionHeader } from '@/components/SectionHeader';
-import { StoreTypeBadge } from '@/components/StoreTypeBadge';
 import { getBrand, getBrandProducts, getCategories, getProduct, getReviews } from '@/lib/api';
-import { date, excerpt, num, plainText } from '@/lib/format';
+import { excerpt, plainText } from '@/lib/format';
 import { appPath, SITE_URL } from '@/lib/links';
+import { storeTypeInfo } from '@/lib/store-types';
 import type { Category, ProductDetail } from '@/lib/types';
 
 type Props = { params: Promise<{ id: string }> };
@@ -81,25 +76,6 @@ function jsonLd(product: ProductDetail) {
   return JSON.stringify(data).replace(/</g, '\\u003c');
 }
 
-function StockLine({ product }: { product: ProductDetail }) {
-  if (!product.inStock) {
-    return (
-      <p className="inline-flex items-center gap-1.5 text-ui font-bold text-danger">
-        <CircleX aria-hidden className="size-4" />
-        خلصان دلوقتي
-      </p>
-    );
-  }
-  const left = product.variants.length ? product.variants.reduce((n, v) => n + (v.inStock ? v.available : 0), 0) : null;
-  return (
-    <p className="inline-flex items-center gap-1.5 text-ui font-bold text-success">
-      <CircleCheck aria-hidden className="size-4" />
-      متوفر
-      {left !== null && left > 0 && left <= 5 ? <span className="font-semibold text-warning">، فاضل {num(left)} بس</span> : null}
-    </p>
-  );
-}
-
 export default async function ProductPage({ params }: Props) {
   const { id } = await params;
   const product = await getProduct(id);
@@ -109,100 +85,87 @@ export default async function ProductPage({ params }: Props) {
   const [store, reviews, more, categories] = await Promise.all([
     slug ? getBrand(slug) : Promise.resolve(null),
     getReviews(product.id, 3),
-    slug ? getBrandProducts(slug, { limit: 7 }) : Promise.resolve({ items: [] }),
+    slug ? getBrandProducts(slug, { limit: 11 }) : Promise.resolve({ items: [] }),
     getCategories(),
   ]);
 
   const storeType = store?.storeType ?? 'BRAND';
-  const others = more.items.filter((p) => p.id !== product.id).slice(0, 6);
+  const others = more.items.filter((p) => p.id !== product.id).slice(0, 10);
   const images = product.images.length ? product.images : product.imageUrl ? [product.imageUrl] : [];
   const imageColors = product.images.length ? product.imageColors : undefined;
   const description = plainText(product.description ?? '');
   const storeName = store?.name ?? product.brand.name;
-  const storeLogo = store?.logoUrl ?? product.brand.logoUrl;
-  // The API only attaches a sale while it runs.
-  const saleEnds = product.sale?.endsAt ?? null;
   const path = appPath.product(product.id);
+  const trail = crumbs(product, categories);
+  const leaf = trail.length > 1 ? trail[trail.length - 1] : null;
+
+  const tabs: ProductTab[] = [];
+  tabs.push({
+    id: 'description',
+    label: 'الوصف',
+    content: (
+      <div className="max-w-3xl">
+        {description ? (
+          <p className="whitespace-pre-line text-body leading-loose text-ink-2">{description}</p>
+        ) : (
+          <p className="text-body text-ink-3">المتجر لسه مكتبش وصف للمنتج ده. شوف الصور والمواصفات، أو اسأل المتجر من التطبيق.</p>
+        )}
+        {product.tags.length ? (
+          <div className="mt-6">
+            <h3 className="text-ui font-bold text-ink-2">دوّر على حاجات شبهه</h3>
+            <ul className="mt-2 flex flex-wrap gap-2">
+              {product.tags.slice(0, 10).map((t) => (
+                <li key={t}>
+                  <Link
+                    href={`/search?q=${encodeURIComponent(t)}`}
+                    className="inline-flex min-h-9 items-center rounded-full border border-line px-3 text-meta font-semibold text-ink-2 transition-colors hover:border-brand hover:text-ink"
+                  >
+                    {t}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+      </div>
+    ),
+  });
+
+  const specExtra = [
+    ...(leaf ? [{ label: 'القسم', value: leaf.label }] : []),
+    ...(product.unit ? [{ label: 'الوحدة', value: product.unit }] : []),
+    { label: 'نوع المتجر', value: storeTypeInfo(storeType).label },
+  ];
+  if (specRows(product.specs ?? []).length) {
+    tabs.push({ id: 'specs', label: 'المواصفات', content: <div className="max-w-3xl"><SpecsTable specs={product.specs ?? []} extra={specExtra} /></div> });
+  }
+  if (store?.shipping) {
+    tabs.push({ id: 'delivery', label: 'التوصيل والترجيع', content: <div className="max-w-4xl"><DeliveryInfo store={store} /></div> });
+  }
+  tabs.push({
+    id: 'reviews',
+    label: 'التقييمات',
+    count: reviews.total,
+    content: <Reviews productId={product.id} items={reviews.items} total={reviews.total} stars={reviews.stars} avg={product.ratingAvg} />,
+  });
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(product) }} />
 
-      <Container className="pt-5 sm:pt-8">
-        <Breadcrumbs items={crumbs(product, categories)} />
+      <Container className="pt-4 sm:pt-6">
+        <Breadcrumbs items={trail} />
 
-        <div className="mt-4 grid gap-8 md:grid-cols-2 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-12">
-          <div className="md:sticky md:top-20 md:self-start">
-            <Gallery images={images} imageColors={imageColors} title={product.title} colorLabel={product.colorLabel} />
-          </div>
-
-          <div className="min-w-0 space-y-6">
-            <div className="space-y-3">
-              {storeName ? (
-                <div className="flex flex-wrap items-center gap-2">
-                  <Link href={slug ? `/brand/${slug}` : '/stores'} className="group inline-flex min-h-11 items-center gap-2">
-                    <span className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-full border border-line bg-sunken">
-                      {storeLogo ? <Image src={storeLogo} alt="" width={36} height={36} className="size-full object-cover" /> : <Store aria-hidden className="size-4 text-ink-3" />}
-                    </span>
-                    <span className="font-bold group-hover:text-accent group-hover:underline">{storeName}</span>
-                  </Link>
-                  <StoreTypeBadge type={storeType} />
-                </div>
-              ) : null}
-
-              <h1 className="text-section font-extrabold leading-snug sm:text-page">{product.title}</h1>
-              <Rating avg={product.ratingAvg} count={product.ratingCount} className="text-ui" />
-            </div>
-
-            <div className="space-y-2">
-              <Price product={product} size="lg" />
-              {product.unit && product.unit !== 'قطعة' ? <p className="text-meta text-ink-3">السعر لكل {product.unit}</p> : null}
-              <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
-                <StockLine product={product} />
-                {saleEnds ? (
-                  <p className="inline-flex items-center gap-1.5 text-ui font-semibold text-danger">
-                    <CalendarClock aria-hidden className="size-4" />
-                    الخصم لحد {date(saleEnds)}
-                  </p>
-                ) : null}
-              </div>
-            </div>
-
-            <ProductOptions variants={product.variants} sizeLabel={product.sizeLabel} colorLabel={product.colorLabel} />
-
-            <StoreTypeDetails product={product} storeType={storeType} />
-
-            <div className="rounded-panel border border-line bg-sunken p-4 sm:p-5">
-              <OpenInApp path={path} className="min-h-13 w-full text-body">
-                {product.inStock ? 'اطلبه من التطبيق' : 'افتحه في التطبيق'}
-              </OpenInApp>
-              <p className="mt-3 text-center text-meta text-ink-2">
-                {product.inStock ? 'الدفع كاش لما الطلب يوصلك. ' : 'تابع المتجر من التطبيق ويوصلك الجديد. '}
-                السلة والكوبونات والنقاط في التطبيق.
-              </p>
-            </div>
+        <div className="mt-4 grid gap-6 sm:mt-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-10 xl:gap-12">
+          <Gallery images={images} imageColors={imageColors} title={product.title} colorLabel={product.colorLabel} />
+          <div className="min-w-0 lg:sticky lg:top-44 lg:self-start">
+            <PurchaseCard product={product} store={store} storeType={storeType} />
           </div>
         </div>
 
-        <div className="mt-14 grid gap-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-12">
-          <div className="min-w-0 space-y-10">
-            {description ? (
-              <section aria-labelledby="desc-title">
-                <h2 id="desc-title" className="text-section font-extrabold">
-                  عن المنتج
-                </h2>
-                <p className="mt-3 max-w-prose whitespace-pre-line text-body text-ink-2">{description}</p>
-              </section>
-            ) : null}
-            <SpecsTable specs={product.specs ?? []} />
-            <Reviews productId={product.id} items={reviews.items} total={reviews.total} stars={reviews.stars} avg={product.ratingAvg} />
-          </div>
-          {store ? (
-            <div className="min-w-0">
-              <DeliveryInfo store={store} />
-            </div>
-          ) : null}
-        </div>
+        <section aria-label="تفاصيل المنتج" className="mt-12 sm:mt-16">
+          <ProductTabs tabs={tabs} />
+        </section>
 
         {others.length ? (
           <section className="mt-16">

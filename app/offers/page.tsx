@@ -1,4 +1,4 @@
-import { Coins } from 'lucide-react';
+import { BadgePercent, Coins, TicketPercent } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -30,24 +30,30 @@ export default async function OffersPage({ searchParams }: { searchParams: Promi
   const running = campaigns.filter((c) => c.endsAt > now && c.startsAt <= now);
 
   return (
-    <Container className="py-8 sm:py-10">
-      <SectionHeader as="h1" title="العروض" body="الخصومات الشغالة دلوقتي من كل المتاجر، الأكبر خصم الأول." />
-
-      <aside className="mb-10 flex flex-col gap-4 rounded-panel border border-line bg-sunken p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
-        <p className="flex items-start gap-3 text-ui font-semibold">
-          <Coins aria-hidden className="mt-0.5 size-5 shrink-0 text-accent" />
-          كوبونات المتاجر ونقاط فاترينة بتتصرف في التطبيق بس.
-        </p>
-        <OpenInApp path={appPath.offers} variant="secondary" className="shrink-0">
-          شوف عروض التطبيق
-        </OpenInApp>
-      </aside>
+    <Container className="py-6 sm:py-10">
+      <section className="relative overflow-hidden rounded-window border border-brand/15 bg-accent-soft px-5 py-8 sm:px-10 sm:py-12">
+        <BadgePercent aria-hidden className="pointer-events-none absolute -inset-e-6 -bottom-8 size-48 text-brand/10 sm:size-64" />
+        <div className="relative max-w-2xl">
+          <h1 className="text-page font-extrabold sm:text-display">عروض النهارده</h1>
+          <p className="mt-2 text-body text-ink-2">
+            الخصومات الشغالة دلوقتي من كل المتاجر، الأكبر خصم الأول.
+            {products.total > 0 ? ` ${num(products.total)} منتج عليه خصم.` : null}
+          </p>
+          <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
+            <OpenInApp path={appPath.offers} className="min-h-12 px-6">
+              شوف عروض التطبيق
+            </OpenInApp>
+            <p className="flex items-start gap-2 text-ui font-semibold text-ink-2">
+              <Coins aria-hidden className="mt-0.5 size-4 shrink-0 text-accent" />
+              كوبونات المتاجر ونقاط فاترينة في التطبيق بس.
+            </p>
+          </div>
+        </div>
+      </section>
 
       {running.length ? (
-        <section aria-labelledby="campaigns-title" className="mb-12">
-          <h2 id="campaigns-title" className="mb-4 text-section font-extrabold">
-            حملات شغالة
-          </h2>
+        <section className="mt-12">
+          <SectionHeader title="حملات شغالة" body="عروض المواسم، كل حملة فيها منتجات من أكتر من متجر." />
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {running.map((c) => (
               <li key={c._id}>
@@ -58,29 +64,44 @@ export default async function OffersPage({ searchParams }: { searchParams: Promi
         </section>
       ) : null}
 
-      {products.items.length ? (
-        <section aria-labelledby="sale-title">
-          <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
-            <h2 id="sale-title" className="text-section font-extrabold">
+      <section aria-labelledby="sale-title" className="mt-12">
+        {products.items.length ? (
+          <>
+            <div className="mb-5 flex flex-wrap items-end justify-between gap-2 sm:mb-6">
+              <h2 id="sale-title" className="text-section font-extrabold sm:text-page">
+                منتجات عليها خصم
+              </h2>
+              <p className="text-ui text-ink-2">
+                <strong className="font-extrabold text-ink">{num(products.total)}</strong> منتج، الأكبر خصم الأول
+              </p>
+            </div>
+            <ProductGrid products={products.items} priorityCount={5} />
+            <Pagination path="/offers" searchParams={sp} page={page} total={products.total} limit={products.limit || LIMIT} />
+          </>
+        ) : (
+          <>
+            <h2 id="sale-title" className="sr-only">
               منتجات عليها خصم
             </h2>
-            <p className="text-ui text-ink-2">{num(products.total)} منتج</p>
-          </div>
-          <ProductGrid products={products.items} priorityCount={4} />
-          <Pagination path="/offers" searchParams={sp} page={page} total={products.total} limit={products.limit || LIMIT} />
-        </section>
-      ) : (
-        <EmptyState
-          art="box"
-          title="مفيش عروض شغالة دلوقتي"
-          body="المتاجر بتنزّل خصومات كل فترة. لحد ما ده يحصل، شوف أحدث المنتجات."
-          action={
-            <Link href="/search" className="inline-flex min-h-11 items-center rounded-full bg-accent px-5 font-bold text-on-accent hover:bg-accent-hover">
-              أحدث المنتجات
-            </Link>
-          }
-        />
-      )}
+            <EmptyState
+              art="box"
+              title={page > 1 ? 'مفيش عروض تانية' : 'مفيش خصومات شغالة دلوقتي'}
+              body="المتاجر بتنزّل خصومات كل فترة، وفي التطبيق كوبونات ونقاط تقدر تستخدمها في أي وقت."
+              action={
+                <>
+                  <Link href="/search" className="inline-flex min-h-11 items-center rounded-full bg-accent px-5 font-bold text-on-accent transition-colors hover:bg-accent-hover">
+                    أحدث المنتجات
+                  </Link>
+                  <OpenInApp path={appPath.offers} variant="secondary">
+                    <TicketPercent aria-hidden className="size-4" />
+                    كوبونات التطبيق
+                  </OpenInApp>
+                </>
+              }
+            />
+          </>
+        )}
+      </section>
     </Container>
   );
 }

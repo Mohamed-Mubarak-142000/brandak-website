@@ -8,26 +8,43 @@ import type { PublicBrand } from '@/lib/types';
 import { Rating } from './Rating';
 import { StoreTypeBadge } from './StoreTypeBadge';
 
-/** A store tile: cover, logo, type badge, rating and how widely it delivers. */
+/** The round store logo, with a fallback icon. */
+export function StoreLogo({ store, size = 64, className }: { store: Pick<PublicBrand, 'name' | 'logoUrl'>; size?: number; className?: string }) {
+  return (
+    <span
+      style={{ width: size, height: size }}
+      className={`grid shrink-0 place-items-center overflow-hidden rounded-full border border-line bg-surface ${className ?? ''}`}
+    >
+      {store.logoUrl ? (
+        <Image src={store.logoUrl} alt={`لوجو ${store.name}`} width={size} height={size} className="size-full object-cover" />
+      ) : (
+        <Store aria-hidden className="size-1/2 text-ink-3" />
+      )}
+    </span>
+  );
+}
+
+/** A store tile: cover, logo overlapping it, name, type badge, rating and delivery reach. */
 export function StoreCard({ store }: { store: PublicBrand }) {
   const zones = store.shipping?.zones?.length ?? 0;
   return (
-    <Link href={`/brand/${store.slug}`} className="group flex w-full flex-col overflow-hidden rounded-panel border border-line bg-surface transition-colors duration-150 hover:border-brand">
-      <div className="relative aspect-[16/7] bg-sunken">
-        {store.coverUrl ? <Image src={store.coverUrl} alt="" fill sizes="(min-width: 1024px) 360px, 100vw" className="object-cover" /> : null}
+    <Link
+      href={`/brand/${store.slug}`}
+      className="group flex w-full flex-col overflow-hidden rounded-panel border border-line bg-surface transition-[border-color,box-shadow] duration-200 hover:border-line-strong hover:shadow-card"
+    >
+      <div className="relative aspect-[16/7] overflow-hidden bg-sunken">
+        {store.coverUrl ? (
+          <Image src={store.coverUrl} alt="" fill sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw" className="object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+        ) : (
+          <div className="absolute inset-0 bg-linear-to-l from-accent-soft to-sunken" />
+        )}
       </div>
-      <div className="flex flex-1 flex-col gap-2 p-4 pt-0">
-        <div className="-mt-8 size-16 overflow-hidden rounded-full border-4 border-surface bg-sunken">
-          {store.logoUrl ? (
-            <Image src={store.logoUrl} alt={`لوجو ${store.name}`} width={64} height={64} className="size-full object-cover" />
-          ) : (
-            <Store aria-hidden className="m-auto mt-4 size-6 text-ink-3" />
-          )}
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <h3 className="text-body font-bold group-hover:text-accent">{store.name}</h3>
+      <div className="flex flex-1 flex-col gap-2 px-4 pb-4">
+        <div className="-mt-8 flex items-end justify-between gap-2">
+          <StoreLogo store={store} size={64} className="border-4 border-surface shadow-card" />
           <StoreTypeBadge type={store.storeType} />
         </div>
+        <h3 className="text-body font-extrabold transition-colors group-hover:text-accent">{store.name}</h3>
         <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 text-meta text-ink-2">
           <Rating avg={store.ratingAvg} count={store.ratingCount} />
           {zones ? (

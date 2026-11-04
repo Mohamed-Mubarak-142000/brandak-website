@@ -1,17 +1,18 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { createElement } from 'react';
 
 import { Breadcrumbs } from '@/components/catalog/Breadcrumbs';
 import { CategoryChips } from '@/components/catalog/CategoryChips';
-import { activeFilters, Filters } from '@/components/catalog/Filters';
-import { Pagination } from '@/components/catalog/Pagination';
+import { activeFilters } from '@/components/catalog/Filters';
 import { pageParam, readFilters, type SearchParams } from '@/components/catalog/params';
+import { ProductListing } from '@/components/catalog/ProductListing';
 import { Container } from '@/components/Container';
 import { EmptyState } from '@/components/EmptyState';
 import { OpenInApp } from '@/components/OpenInApp';
-import { ProductGrid } from '@/components/ProductCard';
 import { getCategories, getProducts } from '@/lib/api';
+import { categoryIcon } from '@/lib/category-icons';
 import { num } from '@/lib/format';
 import { appPath } from '@/lib/links';
 
@@ -36,6 +37,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+const primary = 'inline-flex min-h-11 items-center rounded-full bg-accent px-5 font-bold text-on-accent transition-colors hover:bg-accent-hover';
+
 export default async function CategoryPage({ params, searchParams }: Props) {
   const [{ id }, sp] = await Promise.all([params, searchParams]);
   const { all, category } = await findCategory(id);
@@ -50,59 +53,76 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const ancestors = (category.ancestors ?? []).map((a) => byId.get(a)).filter((c) => c !== undefined);
   const children = all.filter((c) => c.parentId === category._id && c.isActive !== false).sort((a, b) => a.sortOrder - b.sortOrder);
   const filtered = activeFilters(filters).length > 0;
+  const icon = createElement(categoryIcon(category.icon ?? ancestors[0]?.icon), { 'aria-hidden': true, className: 'size-7' });
+
+  const empty =
+    filtered || page > 1 ? (
+      <EmptyState
+        art="search"
+        title="مفيش منتجات بالفلاتر دي"
+        body="جرّب توسّع نطاق السعر أو تشيل فلتر أو اتنين."
+        action={
+          <Link href={path} className={primary}>
+            امسح الفلاتر
+          </Link>
+        }
+      />
+    ) : (
+      <EmptyState
+        art="box"
+        title={`لسه مفيش منتجات في ${category.nameAr}`}
+        body="المتاجر لسه بتضيف منتجاتها هنا. بص على الأقسام التانية، أو افتح القسم في التطبيق."
+        action={
+          <>
+            <Link href="/" className={primary}>
+              شوف كل الأقسام
+            </Link>
+            <OpenInApp path={appPath.category(category._id)} variant="secondary">
+              افتح القسم في التطبيق
+            </OpenInApp>
+          </>
+        }
+      />
+    );
 
   return (
-    <Container className="py-8 sm:py-10">
-      <Breadcrumbs items={[{ label: 'الرئيسية', href: '/' }, ...ancestors.map((a) => ({ label: a.nameAr, href: `/category/${a._id}` })), { label: category.nameAr }]} />
-
-      <div className="mt-3 flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
-        <h1 className="text-page font-extrabold sm:font-sign sm:text-display sm:font-normal">{category.nameAr}</h1>
-        {total > 0 ? <p className="text-ui text-ink-2">{num(total)} منتج</p> : null}
-      </div>
-
-      {children.length ? (
-        <div className="mt-5">
-          <CategoryChips categories={children} label={`أقسام ${category.nameAr}`} />
-        </div>
-      ) : null}
-
-      <div className="mt-8">
-        <Filters path={path} searchParams={sp} filters={filters} storeTypes={category.storeTypes} />
-      </div>
-
-      {items.length ? (
-        <>
-          <ProductGrid products={items} priorityCount={4} />
-          <Pagination path={path} searchParams={sp} page={page} total={total} limit={limit || LIMIT} />
-        </>
-      ) : filtered || page > 1 ? (
-        <EmptyState
-          art="search"
-          title="مفيش منتجات بالفلاتر دي"
-          body="جرّب توسّع نطاق السعر أو تشيل فلتر أو اتنين."
-          action={
-            <Link href={path} className="inline-flex min-h-11 items-center rounded-full bg-accent px-5 font-bold text-on-accent hover:bg-accent-hover">
-              امسح الفلاتر
-            </Link>
-          }
-        />
-      ) : (
-        <EmptyState
-          art="box"
-          title={`لسه مفيش منتجات في ${category.nameAr}`}
-          body="المتاجر لسه بتضيف منتجاتها هنا. بص على الأقسام التانية، أو افتح القسم في التطبيق."
-          action={
-            <div className="flex flex-wrap justify-center gap-3">
-              <Link href="/" className="inline-flex min-h-11 items-center rounded-full bg-accent px-5 font-bold text-on-accent hover:bg-accent-hover">
-                شوف كل الأقسام
-              </Link>
-              <OpenInApp path={appPath.category(category._id)} variant="secondary">
-                افتح القسم في التطبيق
-              </OpenInApp>
+    <>
+      <div className="border-b border-line bg-sunken">
+        <Container className="py-6 sm:py-8">
+          <Breadcrumbs items={[{ label: 'الرئيسية', href: '/' }, ...ancestors.map((a) => ({ label: a.nameAr, href: `/category/${a._id}` })), { label: category.nameAr }]} />
+          <div className="mt-4 flex items-center gap-4">
+            <span className="hidden size-14 shrink-0 place-items-center rounded-panel border border-line bg-surface text-accent sm:grid">
+              {icon}
+            </span>
+            <div className="min-w-0">
+              <h1 className="text-page font-extrabold sm:text-display">{category.nameAr}</h1>
+              <p className="mt-1 text-ui text-ink-2">
+                {total > 0 ? `${num(total)} منتج من متاجر فاترينة، والدفع عند الاستلام` : 'من براندات ومعارض ومخازن ومحلات مصرية'}
+              </p>
             </div>
-          }
+          </div>
+          {children.length ? (
+            <div className="mt-5">
+              <CategoryChips categories={children} label={`أقسام ${category.nameAr}`} />
+            </div>
+          ) : null}
+        </Container>
+      </div>
+
+      <Container className="py-6 sm:py-8">
+        <ProductListing
+          path={path}
+          searchParams={sp}
+          filters={filters}
+          storeTypes={category.storeTypes}
+          clearHref={path}
+          items={items}
+          total={total}
+          page={page}
+          limit={limit || LIMIT}
+          empty={empty}
         />
-      )}
-    </Container>
+      </Container>
+    </>
   );
 }

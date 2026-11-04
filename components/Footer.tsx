@@ -1,73 +1,111 @@
+import { Banknote, Mail, ShieldCheck, Truck } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 import { PLAY_URL, SITE_URL, SUPPORT_EMAIL } from '@/lib/links';
 import { STORE_TYPES } from '@/lib/store-types';
+import type { Category } from '@/lib/types';
 
 import { Container } from './Container';
 import { QrCode } from './QrCode';
 
-const GROUPS = [
-  {
-    title: 'المتاجر',
-    links: [{ href: '/stores', label: 'كل المتاجر' }, ...STORE_TYPES.map((t) => ({ href: t.path, label: t.plural })), { href: '/offers', label: 'العروض' }],
-  },
-  {
-    title: 'فاترينة',
-    links: [
-      { href: '/about', label: 'من نحن' },
-      { href: '/sell', label: 'ابدأ البيع على فاترينة' },
-      { href: '/faq', label: 'الأسئلة الشائعة' },
-      { href: '/contact', label: 'تواصل معانا' },
-    ],
-  },
-  {
-    title: 'القانونية',
-    links: [
-      { href: '/terms', label: 'الشروط والأحكام' },
-      { href: '/privacy', label: 'سياسة الخصوصية' },
-      { href: '/delete-account', label: 'حذف الحساب' },
-    ],
-  },
+const TRUST = [
+  { icon: Banknote, title: 'الدفع عند الاستلام', body: 'مفيش دفع مقدّم على أي طلب.' },
+  { icon: Truck, title: 'توصيل لكل المحافظات', body: 'مصاريف الشحن قدامك قبل ما تطلب.' },
+  { icon: ShieldCheck, title: 'متاجر متراجعة', body: 'كل متجر بيتراجع قبل ما يظهر.' },
 ];
 
-export function Footer() {
+function LinkGroup({ title, links }: { title: string; links: { href: string; label: string }[] }) {
+  return (
+    <nav aria-label={title}>
+      <h2 className="text-ui font-extrabold">{title}</h2>
+      <ul className="mt-3 space-y-0.5">
+        {links.map((l) => (
+          <li key={l.href}>
+            <Link href={l.href} className="inline-flex min-h-9 items-center text-ui text-ink-2 transition-colors hover:text-accent">
+              {l.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
+export function Footer({ categories }: { categories: Category[] }) {
+  const sections = categories
+    .filter((c) => c.isActive !== false && (c.level ?? (c.parentId ? 1 : 0)) === 0)
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .slice(0, 7)
+    .map((c) => ({ href: `/category/${c._id}`, label: c.nameAr }));
+
   return (
     <footer className="mt-24 border-t border-line bg-sunken">
-      <Container className="grid gap-10 py-12 md:grid-cols-[1.3fr_repeat(3,1fr)]">
-        <div>
-          <Image src="/brand/fatrina-logo.png" alt="فاترينة" width={96} height={96} className="h-auto w-20" />
-          <p className="mt-3 max-w-xs text-ui text-ink-2">براندات ومعارض ومخازن ومحلات مصرية في مكان واحد. والدفع كاش لما الطلب يوصلك.</p>
-          <div className="mt-5 flex items-center gap-4">
-            <div className="hidden sm:block">
-              <QrCode value={`${SITE_URL}/download`} size={96} label="امسح الكود عشان تحمّل التطبيق" />
+      {/* Trust row */}
+      <Container className="grid gap-6 border-b border-line py-8 sm:grid-cols-3">
+        {TRUST.map(({ icon: Icon, title, body }) => (
+          <div key={title} className="flex items-center gap-3">
+            <span className="grid size-12 shrink-0 place-items-center rounded-full bg-surface text-accent shadow-card">
+              <Icon aria-hidden className="size-5" />
+            </span>
+            <div>
+              <p className="font-bold">{title}</p>
+              <p className="text-ui text-ink-2">{body}</p>
             </div>
-            <a href={PLAY_URL} className="text-ui font-bold text-accent underline-offset-4 hover:underline">
-              حمّل التطبيق من Google Play
-            </a>
           </div>
-        </div>
-        {GROUPS.map((g) => (
-          <nav key={g.title} aria-label={g.title}>
-            <h2 className="text-ui font-extrabold">{g.title}</h2>
-            <ul className="mt-3 space-y-1">
-              {g.links.map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className="inline-flex min-h-9 items-center text-ui text-ink-2 hover:text-accent">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
         ))}
       </Container>
-      <Container className="flex flex-wrap justify-between gap-2 border-t border-line py-5 text-meta text-ink-3">
-        <span>© فاترينة</span>
-        <a href={`mailto:${SUPPORT_EMAIL}`} className="hover:text-accent">
-          {SUPPORT_EMAIL}
-        </a>
+
+      <Container className="grid gap-10 py-12 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
+        <div>
+          <Link href="/" className="inline-flex items-center gap-2">
+            <Image src="/brand/fatrina-mark.png" alt="" width={40} height={40} />
+            <span className="font-sign text-page text-brand">فاترينة</span>
+          </Link>
+          <p className="mt-3 max-w-xs text-ui text-ink-2">براندات ومعارض ومخازن ومحلات مصرية في مكان واحد. تصفّح هنا، واطلب من التطبيق.</p>
+          <div className="mt-5 flex items-center gap-4 rounded-panel bg-surface p-3 shadow-card">
+            <QrCode value={`${SITE_URL}/download`} size={84} label="امسح الكود عشان تحمّل التطبيق" />
+            <div>
+              <p className="text-ui font-bold">حمّل التطبيق</p>
+              <p className="text-meta text-ink-3">امسح الكود بكاميرا موبايلك</p>
+              <a href={PLAY_URL} className="mt-2 inline-flex min-h-9 items-center rounded-full bg-ink px-4 text-meta font-bold text-surface transition-colors hover:bg-accent">
+                Google Play
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <LinkGroup title="المتاجر" links={[...STORE_TYPES.map((t) => ({ href: t.path, label: t.plural })), { href: '/stores', label: 'كل المتاجر' }, { href: '/offers', label: 'العروض' }]} />
+        {sections.length ? <LinkGroup title="الأقسام" links={sections} /> : null}
+        <LinkGroup
+          title="فاترينة"
+          links={[
+            { href: '/about', label: 'من نحن' },
+            { href: '/sell', label: 'ابدأ البيع على فاترينة' },
+            { href: '/download', label: 'حمّل التطبيق' },
+            { href: '/faq', label: 'الأسئلة الشائعة' },
+            { href: '/contact', label: 'تواصل معانا' },
+          ]}
+        />
+        <LinkGroup
+          title="القانونية"
+          links={[
+            { href: '/terms', label: 'الشروط والأحكام' },
+            { href: '/privacy', label: 'سياسة الخصوصية' },
+            { href: '/delete-account', label: 'حذف الحساب' },
+          ]}
+        />
       </Container>
+
+      <div className="border-t border-line bg-surface">
+        <Container className="flex flex-wrap items-center justify-between gap-3 py-5 text-meta text-ink-3">
+          <span>© فاترينة. كل الحقوق محفوظة.</span>
+          <a href={`mailto:${SUPPORT_EMAIL}`} className="inline-flex min-h-9 items-center gap-1.5 hover:text-accent">
+            <Mail aria-hidden className="size-3.5" />
+            {SUPPORT_EMAIL}
+          </a>
+        </Container>
+      </div>
     </footer>
   );
 }

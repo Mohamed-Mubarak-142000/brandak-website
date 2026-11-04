@@ -11,28 +11,28 @@ export function specValue(value: SpecValue, unit: string | null) {
 
 const hasValue = (s: Spec) => s.value !== '' && s.value !== null && s.value !== undefined;
 
-/** Every spec as a two-column table (label, value + unit). */
-export function SpecsTable({ specs }: { specs: Spec[] }) {
-  const rows = specs.filter(hasValue);
+export const specRows = (specs: Spec[]) => specs.filter(hasValue);
+
+/** Every spec as a two-column table (label, value + unit). `extra` rows go first (e.g. the category). */
+export function SpecsTable({ specs, extra = [] }: { specs: Spec[]; extra?: Fact[] }) {
+  const rows = [...extra, ...specRows(specs).map((s) => ({ label: s.label, value: specValue(s.value, s.unit) }))];
   if (!rows.length) return null;
   return (
-    <section aria-labelledby="specs-title">
-      <h2 id="specs-title" className="text-section font-extrabold">
-        المواصفات
-      </h2>
-      <table className="mt-3 w-full overflow-hidden rounded-panel border border-line text-ui">
+    <div className="overflow-hidden rounded-panel border border-line">
+      <table className="w-full text-ui">
+        <caption className="sr-only">مواصفات المنتج</caption>
         <tbody>
           {rows.map((s) => (
-            <tr key={s.key} className="border-b border-line last:border-b-0 odd:bg-sunken/60">
-              <th scope="row" className="w-2/5 px-4 py-2.5 text-start font-semibold text-ink-2">
+            <tr key={s.label} className="border-b border-line last:border-b-0 odd:bg-sunken">
+              <th scope="row" className="w-2/5 px-4 py-3 text-start align-top font-semibold text-ink-2 sm:w-1/3 sm:px-5">
                 {s.label}
               </th>
-              <td className="px-4 py-2.5">{specValue(s.value, s.unit)}</td>
+              <td className="px-4 py-3 font-semibold text-ink sm:px-5">{s.value}</td>
             </tr>
           ))}
         </tbody>
       </table>
-    </section>
+    </div>
   );
 }
 
@@ -47,9 +47,9 @@ export function KeyFacts({ facts }: { facts: Fact[] }) {
   return (
     <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3">
       {facts.map((f) => (
-        <div key={f.label} className="rounded-card border border-line bg-surface px-3 py-2">
+        <div key={f.label} className="rounded-card bg-sunken px-3 py-2.5">
           <dt className="text-meta text-ink-3">{f.label}</dt>
-          <dd className="text-ui font-bold">{f.value}</dd>
+          <dd className="mt-0.5 text-ui font-bold">{f.value}</dd>
         </div>
       ))}
     </dl>

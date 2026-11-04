@@ -46,11 +46,13 @@ const FEATURES = [
 
 export function SellerDesk() {
   return (
-    <ul className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {FEATURES.map(({ icon: Icon, title, body }) => (
-        <li key={title}>
-          <Icon aria-hidden className="size-7 text-brand" strokeWidth={1.75} />
-          <h3 className="mt-3 text-body font-extrabold">{title}</h3>
+        <li key={title} className="rounded-panel border border-line bg-surface p-5 transition-colors hover:border-line-strong">
+          <span className="grid size-12 place-items-center rounded-card bg-accent-soft text-accent">
+            <Icon aria-hidden className="size-6" strokeWidth={1.75} />
+          </span>
+          <h3 className="mt-4 font-extrabold">{title}</h3>
           <p className="mt-1 text-ui text-ink-2">{body}</p>
         </li>
       ))}

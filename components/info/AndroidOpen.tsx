@@ -24,18 +24,27 @@ export function AndroidOpen({ path, serverGuess }: { path: AppPath; serverGuess:
   if (!android) return null;
 
   return (
-    <div className="rounded-panel border border-line bg-surface p-5 sm:p-6">
-      <p className="text-section font-extrabold">بنفتحلك فاترينة دلوقتي…</p>
-      <p className="mt-1 text-ink-2">لو التطبيق مش متسطّب، هيفتحلك Google Play تنزّله منه.</p>
-      <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
+    <div className="rounded-window border border-line bg-surface p-5 shadow-card sm:p-6">
+      <div className="flex items-center gap-3">
+        <span aria-hidden className="relative grid size-11 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
+          <Smartphone className="size-5" />
+          <span className="absolute -inset-e-0.5 -top-0.5 size-3 animate-pulse rounded-full border-2 border-surface bg-success" />
+        </span>
+        <p className="text-section font-extrabold">بنفتحلك فاترينة دلوقتي…</p>
+      </div>
+      <p className="mt-2 text-ink-2">لو التطبيق مش متسطّب، هيفتحلك Google Play تنزّله منه.</p>
+      <div className="mt-5 flex flex-wrap items-center gap-3">
         <a
           href={androidIntent(path)}
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-accent px-6 font-bold text-on-accent hover:bg-accent-hover"
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-accent px-6 font-bold text-on-accent transition-colors hover:bg-accent-hover"
         >
           <Smartphone aria-hidden className="size-5" />
           افتح التطبيق
         </a>
-        <a href={PLAY_URL} className="inline-flex min-h-11 items-center font-bold text-accent underline-offset-4 hover:underline">
+        <a
+          href={PLAY_URL}
+          className="inline-flex min-h-12 items-center justify-center rounded-full border border-line-strong bg-surface px-6 font-bold transition-colors hover:border-brand"
+        >
           حمّله من Google Play
         </a>
       </div>

@@ -1,68 +1,65 @@
 import { AppPerks } from '@/components/AppPerks';
 import { Container } from '@/components/Container';
 import { CampaignCards } from '@/components/home/CampaignCards';
-import { CategoryRail } from '@/components/home/CategoryRail';
-import { Hero } from '@/components/home/Hero';
+import { HeroBanner } from '@/components/home/HeroBanner';
+import { HomeSearch } from '@/components/home/HomeSearch';
 import { HowItWorks } from '@/components/home/HowItWorks';
+import { SectionsMarquee } from '@/components/home/SectionsMarquee';
 import { SellerCta } from '@/components/home/SellerCta';
+import { StoreLogos } from '@/components/home/StoreLogos';
 import { StoreTypeFronts } from '@/components/home/StoreTypeFronts';
-import { TrustStrip } from '@/components/home/TrustStrip';
 import { ProductGrid } from '@/components/ProductCard';
 import { SectionHeader } from '@/components/SectionHeader';
-import { StoreGrid } from '@/components/StoreCard';
 import { getBrands, getCampaigns, getCategories, getFeaturedProducts, getProducts, getTerms } from '@/lib/api';
 import { STORE_TYPES } from '@/lib/store-types';
 import type { StoreType } from '@/lib/types';
 
 export default async function Home() {
-  const [newest, featured, categories, stores, campaigns, terms, ...typeCounts] = await Promise.all([
-    getProducts({ sort: 'newest', limit: 10 }),
+  const [featured, newest, categories, stores, campaigns, terms, typeCounts] = await Promise.all([
     getFeaturedProducts(),
+    getProducts({ sort: 'newest', limit: 10 }),
     getCategories(),
-    getBrands({ sort: 'rating', limit: 6 }),
+    getBrands({ limit: 24 }),
     getCampaigns(),
     getTerms(),
-    ...STORE_TYPES.map((t) => getBrands({ storeType: t.type, limit: 1 }).then((r) => r.total)),
+    Promise.all(STORE_TYPES.map((t) => getBrands({ storeType: t.type, limit: 1 }).then((r) => r.total))),
   ]);
+  const showcase = featured.length ? featured.slice(0, 10) : newest.items;
 
-  const counts = Object.fromEntries(STORE_TYPES.map((t, i) => [t.type, typeCounts[i] as number])) as Record<StoreType, number>;
+  const counts = Object.fromEntries(STORE_TYPES.map((t, i) => [t.type, typeCounts[i]])) as Record<StoreType, number>;
   const sections = categories
-    .filter((c) => (c.level ?? 0) === 0 && !c.parentId && c.isActive !== false)
+    .filter((c) => (c.level ?? (c.parentId ? 1 : 0)) === 0 && c.isActive !== false)
     .sort((a, b) => a.sortOrder - b.sortOrder);
-  const showcase = featured.length ? featured : newest.items;
 
   return (
-    <>
-      <Hero products={newest.items} />
-      <TrustStrip />
+    <Container className="space-y-16 pb-16 sm:space-y-20 sm:pb-20">
+      <div>
+        <HeroBanner campaigns={campaigns} commissionRate={terms.commissionRate} />
+        <div className="mt-10 sm:mt-14">
+          <HomeSearch sections={sections} />
+        </div>
+      </div>
 
-      <Container className="mt-14 space-y-16 sm:mt-20 sm:space-y-24">
-        <StoreTypeFronts counts={counts} />
-        <CategoryRail categories={sections} />
+      <StoreTypeFronts counts={counts} />
+      <SectionsMarquee sections={sections} />
 
-        {showcase.length ? (
-          <section>
-            <SectionHeader
-              title={featured.length ? 'مختارات من فاترينة' : 'وصل جديد'}
-              body={featured.length ? undefined : 'آخر المنتجات اللي نزلت في المتاجر.'}
-              href={featured.length ? '/offers' : '/search'}
-            />
-            <ProductGrid products={showcase.slice(0, 10)} />
-          </section>
-        ) : null}
+      {showcase.length ? (
+        <section>
+          <SectionHeader
+            title={featured.length ? 'مختارات من فاترينة' : 'وصل جديد'}
+            body={featured.length ? 'منتجات اخترناها لك من المتاجر.' : 'آخر المنتجات اللي نزلت في المتاجر.'}
+            href="/search"
+            linkLabel="كل المنتجات"
+          />
+          <ProductGrid products={showcase} />
+        </section>
+      ) : null}
 
-        {stores.items.length ? (
-          <section>
-            <SectionHeader title="اتفرّج على المتاجر" href="/stores" linkLabel="كل المتاجر" />
-            <StoreGrid stores={stores.items} />
-          </section>
-        ) : null}
-
-        <CampaignCards campaigns={campaigns} />
-        <HowItWorks />
-        <AppPerks />
-        <SellerCta commissionRate={terms.commissionRate} />
-      </Container>
-    </>
+      <StoreLogos stores={stores.items} />
+      <CampaignCards campaigns={campaigns} />
+      <HowItWorks />
+      <AppPerks />
+      <SellerCta commissionRate={terms.commissionRate} />
+    </Container>
   );
 }

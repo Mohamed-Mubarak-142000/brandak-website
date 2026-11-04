@@ -1,14 +1,14 @@
 import type { Metadata, Viewport } from 'next';
 import { Cairo, Lalezar } from 'next/font/google';
 
-import { AppBanner } from '@/components/AppBanner';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
+import { getCategories } from '@/lib/api';
 import { SITE_URL } from '@/lib/links';
 
 import './globals.css';
 
-// Cairo is the app's font; Lalezar is shop-sign lettering, used only for big headlines.
+// Cairo is the app's font; Lalezar is shop-sign lettering, used only for the home banner headlines.
 const cairo = Cairo({
   subsets: ['arabic', 'latin'],
   weight: ['400', '500', '600', '700', '800'],
@@ -32,26 +32,26 @@ export const metadata: Metadata = {
   other: { 'google-play-app': 'app-id=app.fatrina' },
 };
 
+// White on every device, dark mode included.
 export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#fefcf7' },
-    { media: '(prefers-color-scheme: dark)', color: '#17110d' },
-  ],
+  themeColor: '#ffffff',
+  colorScheme: 'light',
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  // Sections for the header's "تسوّق" menu and the footer (cached with the rest of the API).
+  const categories = await getCategories();
   return (
     <html lang="ar" dir="rtl" className={`${cairo.variable} ${lalezar.variable}`}>
       <body className="flex min-h-dvh flex-col antialiased">
-        <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-accent focus:px-4 focus:py-2 focus:text-on-accent">
+        <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:inset-s-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-accent focus:px-4 focus:py-2 focus:text-on-accent">
           تخطّى للمحتوى
         </a>
-        <AppBanner />
-        <Header />
+        <Header categories={categories} />
         <main id="main" className="flex-1">
           {children}
         </main>
-        <Footer />
+        <Footer categories={categories} />
       </body>
     </html>
   );

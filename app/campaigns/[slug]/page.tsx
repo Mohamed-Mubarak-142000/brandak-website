@@ -1,10 +1,10 @@
-import { CalendarClock } from 'lucide-react';
+import { CalendarClock, Clock, Percent } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { Breadcrumbs } from '@/components/catalog/Breadcrumbs';
-import { safeColor } from '@/components/catalog/CampaignCard';
+import { safeColor, timeLeft, tint } from '@/components/catalog/CampaignCard';
 import { Pagination } from '@/components/catalog/Pagination';
 import { pageParam, type SearchParams } from '@/components/catalog/params';
 import { Container } from '@/components/Container';
@@ -12,6 +12,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { OpenInApp } from '@/components/OpenInApp';
 import { ProductGrid } from '@/components/ProductCard';
 import { getCampaign, getProducts } from '@/lib/api';
+import { cn } from '@/lib/cn';
 import { date, excerpt, num } from '@/lib/format';
 import { appPath } from '@/lib/links';
 
@@ -37,33 +38,58 @@ export default async function CampaignPage({ params, searchParams }: Props) {
 
   const page = pageParam(sp);
   const products = await getProducts({ campaignId: campaign._id, page, limit: LIMIT });
-  const ended = new Date(campaign.endsAt).getTime() < new Date().getTime();
+  const left = timeLeft(campaign);
+  const ended = left.state === 'ended';
   const path = `/campaigns/${campaign.slug}`;
+  const color = safeColor(campaign.color);
 
   return (
-    <Container className="py-8 sm:py-10">
-      <Breadcrumbs items={[{ label: 'الرئيسية', href: '/' }, { label: 'العروض', href: '/offers' }, { label: campaign.nameAr }]} />
-
-      <header className="mt-4 overflow-hidden rounded-panel border border-line bg-surface">
-        <div aria-hidden className="h-3" style={{ background: safeColor(campaign.color) }} />
-        <div className="p-5 sm:p-8">
-          <h1 className="text-page font-extrabold sm:font-sign sm:text-display sm:font-normal">{campaign.nameAr}</h1>
-          {campaign.descriptionAr ? <p className="mt-2 max-w-2xl whitespace-pre-line text-body text-ink-2">{campaign.descriptionAr}</p> : null}
-          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-ui">
-            <span className="inline-flex items-center gap-1.5 font-semibold">
-              <CalendarClock aria-hidden className="size-4 text-accent" />
-              {ended ? `خلص في ${date(campaign.endsAt)}` : `من ${date(campaign.startsAt)} لحد ${date(campaign.endsAt)}`}
-            </span>
-            {campaign.minPercent > 0 ? <span className="rounded-full bg-danger-soft px-3 py-0.5 font-bold text-danger">خصم {num(campaign.minPercent)}٪ وأكتر</span> : null}
+    <>
+      <div className="border-b border-line" style={{ background: tint(color, 12) }}>
+        <Container className="py-6 sm:py-10">
+          <Breadcrumbs items={[{ label: 'الرئيسية', href: '/' }, { label: 'العروض', href: '/offers' }, { label: campaign.nameAr }]} />
+          <div className="mt-5 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+            <div className="min-w-0 max-w-2xl">
+              <span className="mb-4 grid size-12 place-items-center rounded-full bg-surface shadow-card" style={{ color }}>
+                <Percent aria-hidden className="size-6" />
+              </span>
+              <h1 className="text-page font-extrabold sm:text-display">{campaign.nameAr}</h1>
+              {campaign.descriptionAr ? <p className="mt-2 whitespace-pre-line text-body text-ink-2">{campaign.descriptionAr}</p> : null}
+              <div className="mt-5 flex flex-wrap items-center gap-2 text-ui">
+                <span
+                  className={cn(
+                    'inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 font-bold',
+                    ended ? 'bg-surface text-ink-3' : 'bg-ink text-ground',
+                  )}
+                >
+                  <Clock aria-hidden className="size-4" />
+                  {left.text}
+                </span>
+                {!ended ? (
+                  <span className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-surface px-3 font-semibold text-ink-2">
+                    <CalendarClock aria-hidden className="size-4" />
+                    من {date(campaign.startsAt)} لحد {date(campaign.endsAt)}
+                  </span>
+                ) : null}
+                {campaign.minPercent > 0 ? (
+                  <span className="inline-flex min-h-9 items-center rounded-full bg-surface px-3 font-extrabold text-danger">خصم {num(campaign.minPercent)}٪ وأكتر</span>
+                ) : null}
+              </div>
+            </div>
+            <OpenInApp path={appPath.offers} className="shrink-0 self-start sm:self-auto">
+              كوبونات التطبيق
+            </OpenInApp>
           </div>
-        </div>
-      </header>
+        </Container>
+      </div>
 
-      <div className="mt-10">
+      <Container className="py-8 sm:py-10">
         {products.items.length ? (
           <>
-            <p className="mb-4 text-ui text-ink-2">{num(products.total)} منتج في العرض</p>
-            <ProductGrid products={products.items} priorityCount={4} />
+            <p className="mb-5 text-ui text-ink-2">
+              <strong className="font-extrabold text-ink">{num(products.total)}</strong> منتج في العرض
+            </p>
+            <ProductGrid products={products.items} priorityCount={5} />
             <Pagination path={path} searchParams={sp} page={page} total={products.total} limit={products.limit || LIMIT} />
           </>
         ) : (
@@ -72,18 +98,18 @@ export default async function CampaignPage({ params, searchParams }: Props) {
             title={ended ? 'العرض ده خلص' : 'لسه مفيش منتجات في العرض ده'}
             body={ended ? 'بص على العروض الشغالة دلوقتي.' : 'المتاجر بتضيف منتجاتها للعرض. ارجع بعد شوية، أو شوف العروض التانية.'}
             action={
-              <div className="flex flex-wrap justify-center gap-3">
-                <Link href="/offers" className="inline-flex min-h-11 items-center rounded-full bg-accent px-5 font-bold text-on-accent hover:bg-accent-hover">
+              <>
+                <Link href="/offers" className="inline-flex min-h-11 items-center rounded-full bg-accent px-5 font-bold text-on-accent transition-colors hover:bg-accent-hover">
                   كل العروض
                 </Link>
                 <OpenInApp path={appPath.offers} variant="secondary">
                   عروض التطبيق
                 </OpenInApp>
-              </div>
+              </>
             }
           />
         )}
-      </div>
-    </Container>
+      </Container>
+    </>
   );
 }
