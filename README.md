@@ -22,7 +22,7 @@ npm run preview              # the real Cloudflare runtime locally, http://local
 ## Deploy (Cloudflare Workers, from GitHub)
 1. Cloudflare dashboard → **Workers & Pages** → **Create** → **Import a repository** → pick `brandak-website`.
 2. Build settings:
-   - Project name: `fatrina-web` (must match `name` in `wrangler.jsonc`)
+   - Project name: `brandak-website` (must match `name` in `wrangler.jsonc`)
    - Build command: `npx opennextjs-cloudflare build`
    - Deploy command: `npx opennextjs-cloudflare deploy`
    - Root directory: `/`
