@@ -93,7 +93,7 @@ export function RegisterForm({ next }: { next: string }) {
         ltr
       />
       <div className="flex flex-col gap-2">
-        <PasswordInput label="كلمة السر" value={password} onChange={setPassword} error={errors.password} autoComplete="new-password" placeholder="8 حروف على الأقل، فيها حرف ورقم" />
+        <PasswordInput label="كلمة السر" value={password} onChange={setPassword} error={errors.password} autoComplete="new-password" placeholder="اختار كلمة سر قوية" />
         <PasswordHints value={password} />
       </div>
       <p className="text-meta text-ink-3">

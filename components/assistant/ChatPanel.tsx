@@ -32,7 +32,7 @@ const MAX = 500;
 const chip = 'inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border border-line-strong bg-surface px-4 text-ui font-bold text-ink transition-colors hover:border-brand';
 
 export function ChatPanel({ slug, name, greeting, suggestions, productId, whatsapp, store, open, onClose, onDisabled }: ChatPanelProps) {
-  const { messages, busy, error, send, retry, reset } = useConversation(slug, productId);
+  const { messages, busy, slow, error, send, retry, reset } = useConversation(slug, productId);
   const [draft, setDraft] = useState('');
   const [menu, setMenu] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -169,6 +169,7 @@ export function ChatPanel({ slug, name, greeting, suggestions, productId, whatsa
               {[0, 150, 300].map((d) => (
                 <span key={d} aria-hidden style={{ animationDelay: `${d}ms` }} className="size-2 rounded-full bg-ink-3 motion-safe:animate-bounce" />
               ))}
+              {slow ? <span className="ms-2 text-meta text-ink-3">لسه بيدوّر على الإجابة، ثواني…</span> : null}
             </span>
           </div>
         ) : null}

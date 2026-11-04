@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { discountPercent, num, originalPrice, price } from '@/lib/format';
 import type { ProductCard as Product } from '@/lib/types';
 
+import { CardCartControl } from './cart/CardCartControl';
 import { Rating } from './Rating';
 import { WishlistButton } from './WishlistButton';
 
@@ -19,11 +20,8 @@ export function ProductCard({ product, priority }: { product: Product; priority?
 
   // The heart sits beside the link, not inside it: a button can't live in an <a>.
   return (
-    <div className="relative h-full min-w-0">
-    <Link
-      href={`/product/${product.id}`}
-      className="group flex h-full min-w-0 flex-col overflow-hidden rounded-card border border-line bg-surface transition-[border-color,box-shadow] duration-200 hover:border-line-strong hover:shadow-card"
-    >
+    <div className="relative flex h-full min-w-0 flex-col rounded-card border border-line bg-surface transition-[border-color,box-shadow] duration-200 hover:border-line-strong hover:shadow-card">
+    <Link href={`/product/${product.id}`} className="group flex min-w-0 flex-1 flex-col overflow-hidden rounded-t-card">
       <div className="relative aspect-square overflow-hidden bg-sunken">
         {product.imageUrl ? (
           <Image
@@ -70,6 +68,10 @@ export function ProductCard({ product, priority }: { product: Product; priority?
         <Rating avg={product.ratingAvg} count={product.ratingCount} />
       </div>
     </Link>
+    {/* Outside the link: buttons can't live inside an <a>. */}
+    <div className="px-3 pb-3">
+      <CardCartControl product={product} />
+    </div>
     <WishlistButton productId={product.id} title={product.title} className="absolute start-2 top-2 z-10" />
     </div>
   );

@@ -107,6 +107,9 @@ export function useConversation(slug: string, productId?: string) {
   const [conversationId, setConversationId] = useState<string | null>(initial.conversationId);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<ChatError | null>(null);
+  /** True while a reply takes longer than usual, so the panel can say it's still working. */
+  const [slow, setSlow] = useState(false);
+  const slowTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const failedText = useRef<string | null>(null);
   const busyRef = useRef(false);
   const generation = useRef(0);
@@ -117,19 +120,35 @@ export function useConversation(slug: string, productId?: string) {
   }, [slug, messages, conversationId]);
 
   const request = useCallback(
-    async (text: string) => {
+    async (text: string): Promise<void> => {
       const gen = generation.current;
       busyRef.current = true;
       setBusy(true);
       setError(null);
+      setSlow(false);
+      clearTimeout(slowTimer.current);
+      slowTimer.current = setTimeout(() => gen === generation.current && setSlow(true), 8_000);
+      const body = {
+        ...(conversationId ? { conversationId } : {}),
+        visitorId: visitorId(),
+        text,
+        ...(productId ? { productId } : {}),
+      };
       try {
-        const res = await api.post<Reply>(`brands/${encodeURIComponent(slug)}/assistant/messages`, {
-          ...(conversationId ? { conversationId } : {}),
-          visitorId: visitorId(),
-          text,
-          ...(productId ? { productId } : {}),
-        });
+        let res: Reply | undefined;
+        // A busy model or a dropped connection usually clears in a moment: try once more quietly
+        // before showing an error (the server refunds failed calls, so this costs no quota).
+        for (let attempt = 0; !res; attempt++) {
+          try {
+            res = await api.post<Reply>(`brands/${encodeURIComponent(slug)}/assistant/messages`, body);
+          } catch (e) {
+            const transient = e instanceof ApiError && (e.status === 503 || e.status === 504 || e.code === 'NETWORK');
+            if (!transient || attempt > 0 || gen !== generation.current) throw e;
+            await new Promise((r) => setTimeout(r, 1_500));
+          }
+        }
         if (gen !== generation.current) return; // the chat was reset meanwhile
+        const reply = res.reply;
         failedText.current = null;
         setConversationId(res.conversationId);
         setMessages((m) =>
@@ -138,10 +157,10 @@ export function useConversation(slug: string, productId?: string) {
             {
               id: randomId(),
               role: 'assistant' as const,
-              text: res.reply.text,
-              products: res.reply.products?.slice(0, 6) ?? [],
-              actions: res.reply.actions ?? [],
-              unanswered: !!res.reply.unanswered,
+              text: reply.text,
+              products: reply.products?.slice(0, 6) ?? [],
+              actions: reply.actions ?? [],
+              unanswered: !!reply.unanswered,
             },
           ].slice(-KEEP),
         );
@@ -152,8 +171,10 @@ export function useConversation(slug: string, productId?: string) {
         setError(err);
       } finally {
         if (gen === generation.current) {
+          clearTimeout(slowTimer.current);
           busyRef.current = false;
           setBusy(false);
+          setSlow(false);
         }
       }
     },
@@ -180,11 +201,13 @@ export function useConversation(slug: string, productId?: string) {
     generation.current += 1;
     failedText.current = null;
     busyRef.current = false;
+    clearTimeout(slowTimer.current);
+    setSlow(false);
     setBusy(false);
     setError(null);
     setMessages([]);
     setConversationId(null);
   }, []);
 
-  return { messages, busy, error, send, retry, reset };
+  return { messages, busy, slow, error, send, retry, reset };
 }

@@ -100,8 +100,10 @@ export function PasswordInput({ label, value, onChange, error, hint, className, 
             type={shown ? 'text' : 'password'}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            dir="ltr"
-            className={cn(inputClass, 'pe-12 text-start')}
+            // Stays in the page's RTL so `pe-12` lands on the same side as the eye button (a forced
+            // dir="ltr" put the padding on the right and the Arabic placeholder ran under the icon).
+            // plaintext still lays a typed Latin password out left-to-right.
+            className={cn(inputClass, 'pe-12 [unicode-bidi:plaintext]')}
           />
           <button
             type="button"

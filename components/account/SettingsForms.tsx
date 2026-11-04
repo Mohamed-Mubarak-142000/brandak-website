@@ -88,7 +88,7 @@ export function PasswordForm() {
       {failure ? <Alert title={failure} /> : null}
       <PasswordInput label="كلمة السر الحالية" value={current} onChange={setCurrent} error={errors.current} autoComplete="current-password" />
       <div className="flex flex-col gap-2">
-        <PasswordInput label="كلمة السر الجديدة" value={next} onChange={setNext} error={errors.next} autoComplete="new-password" placeholder="8 حروف على الأقل، فيها حرف ورقم" />
+        <PasswordInput label="كلمة السر الجديدة" value={next} onChange={setNext} error={errors.next} autoComplete="new-password" placeholder="اختار كلمة سر قوية" />
         <PasswordHints value={next} />
       </div>
       {notice ? <Alert tone="success" title={notice} /> : null}

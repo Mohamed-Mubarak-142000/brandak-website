@@ -1,8 +1,8 @@
+import { Heart, PackageCheck, Store } from 'lucide-react';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { AuthCard } from '@/components/auth/AuthCard';
+import { AuthSplit } from '@/components/auth/AuthCard';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { first, type AuthSearch } from '@/components/auth/params';
 import { getSession, safeNext } from '@/lib/session';
@@ -17,19 +17,25 @@ export default async function LoginPage({ searchParams }: { searchParams: AuthSe
   if ((await getSession()).session) redirect(next);
 
   return (
-    <AuthCard
+    <AuthSplit
+      mode="login"
+      next={next}
       title="أهلاً بيك تاني"
       subtitle="سجّل دخول عشان تكمل طلباتك ومفضلتك."
-      footer={
+      headline={
         <>
-          أول مرة على فاترينة؟{' '}
-          <Link href={`/register?next=${encodeURIComponent(next)}`} className="font-bold text-accent hover:underline underline-offset-4">
-            اعمل حساب جديد
-          </Link>
+          كل المتاجر
+          <br />
+          في فاترينة واحدة
         </>
       }
+      perks={[
+        { icon: PackageCheck, title: 'طلباتك قدامك', text: 'تابع كل طلب خطوة بخطوة لحد ما يوصلك.' },
+        { icon: Heart, title: 'مفضلتك محفوظة', text: 'اللي عجبك هتلاقيه مستنيك على أي جهاز.' },
+        { icon: Store, title: 'متاجر كتير', text: 'اتسوّق من أكتر من متجر في سلة واحدة.' },
+      ]}
     >
       <LoginForm next={next} />
-    </AuthCard>
+    </AuthSplit>
   );
 }

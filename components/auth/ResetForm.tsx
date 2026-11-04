@@ -84,7 +84,7 @@ export function ResetForm({ identifier, next }: { identifier: string; next: stri
         </div>
       </div>
       <div className="flex flex-col gap-2">
-        <PasswordInput label="كلمة السر الجديدة" value={password} onChange={setPassword} error={errors.password} autoComplete="new-password" placeholder="8 حروف على الأقل، فيها حرف ورقم" />
+        <PasswordInput label="كلمة السر الجديدة" value={password} onChange={setPassword} error={errors.password} autoComplete="new-password" placeholder="اختار كلمة سر قوية" />
         <PasswordHints value={password} />
       </div>
       <SubmitButton busy={busy}>{busy ? 'بنحفظ...' : 'احفظ كلمة السر'}</SubmitButton>
