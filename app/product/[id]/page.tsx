@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { AppPerks } from '@/components/AppPerks';
+import { AssistantLauncher } from '@/components/assistant/AssistantLauncher';
 import { Breadcrumbs, type Crumb } from '@/components/catalog/Breadcrumbs';
 import { Container } from '@/components/Container';
 import { DeliveryInfo } from '@/components/product/DeliveryInfo';
@@ -179,6 +180,7 @@ export default async function ProductPage({ params }: Props) {
         </div>
       </Container>
 
+      {slug ? <AssistantLauncher slug={slug} productId={product.id} /> : null}
       <StickyOrderBar product={product} acceptsOrders={store?.shipping?.acceptsOrders ?? true} />
     </>
   );

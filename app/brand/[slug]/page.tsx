@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { AppPerks } from '@/components/AppPerks';
+import { AssistantLauncher } from '@/components/assistant/AssistantLauncher';
 import { Container } from '@/components/Container';
 import { EmptyState } from '@/components/EmptyState';
 import { OpenInApp } from '@/components/OpenInApp';
@@ -181,6 +182,8 @@ export default async function StorePage({ params, searchParams }: Props) {
         </div>
         <AppPerks compact path={appPath.brand(store.slug)} />
       </section>
+
+      <AssistantLauncher slug={store.slug} />
     </Container>
   );
 }
