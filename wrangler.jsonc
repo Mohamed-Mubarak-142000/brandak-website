@@ -1,0 +1,23 @@
+// Cloudflare Workers config for the OpenNext build (`npx opennextjs-cloudflare build` writes .open-next/).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fatrina-web",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      // Must match "name" above.
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "fatrina-web"
+    }
+  ],
+  "observability": { "enabled": true }
+  // Optional: page/data caching between requests (ISR). Enable R2 in the dashboard, create a bucket
+  // named "fatrina-web-cache", uncomment this block and the override in open-next.config.ts.
+  // "r2_buckets": [{ "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "fatrina-web-cache" }]
+}

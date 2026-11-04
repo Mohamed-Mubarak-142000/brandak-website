@@ -1,0 +1,155 @@
+@import "tailwindcss";
+
+/*
+ * Fatrina web — same tokens as the app (`brandak app/src/theme/tokens.ts`) and the dashboard.
+ * --brand is the exact logo orange (#F16B21): marks, awnings, counters, focus.
+ * --accent is the orange deepened so white text on it passes WCAG AA; use it for filled buttons.
+ * Unlike the dashboard, the site follows the visitor's dark mode, like the app does.
+ */
+:root {
+  color-scheme: light;
+
+  --ground: #fefcf7;
+  --surface: #ffffff;
+  --sunken: #fff6ee;
+  --line: #f1e5d8;
+  --line-strong: #e3cfbb;
+
+  --ink: #2a1d14;
+  --ink-2: #5b4839;
+  --ink-3: #7a6656;
+
+  --brand: #f16b21;
+  --accent: #c2500f;
+  --accent-hover: #a5430b;
+  --accent-soft: #ffeadb;
+  --on-accent: #ffffff;
+
+  --success: #1d7348;
+  --success-soft: #e3f2e8;
+  --warning: #7a5b00;
+  --warning-soft: #f7f0d4;
+  --danger: #b42318;
+  --danger-soft: #fde8e5;
+
+  --skeleton: #f4eae0;
+  --shadow-pop: 0 12px 32px -12px rgb(42 29 20 / 0.25), 0 2px 6px -2px rgb(42 29 20 / 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --ground: #17110d;
+    --surface: #211913;
+    --sunken: #2a2018;
+    --line: #3a2d23;
+    --line-strong: #4e3d30;
+
+    --ink: #fbf3ea;
+    --ink-2: #d9c7b6;
+    --ink-3: #b09a87;
+
+    --brand: #f7843f;
+    --accent: #e0651f;
+    --accent-hover: #c2500f;
+    --accent-soft: #3d2416;
+    --on-accent: #1a0e06;
+
+    --success: #5cc48c;
+    --success-soft: #173326;
+    --warning: #e2be52;
+    --warning-soft: #33290f;
+    --danger: #f2766b;
+    --danger-soft: #3d1a16;
+
+    --skeleton: #2e241c;
+    --shadow-pop: 0 12px 32px -12px rgb(0 0 0 / 0.6);
+  }
+}
+
+@theme inline {
+  --color-ground: var(--ground);
+  --color-surface: var(--surface);
+  --color-sunken: var(--sunken);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-brand: var(--brand);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-skeleton: var(--skeleton);
+
+  /* Cairo for everything; Lalezar (shop-sign lettering) only for big headlines. */
+  --font-sans: var(--font-cairo), system-ui, sans-serif;
+  --font-sign: var(--font-lalezar), var(--font-cairo), system-ui, sans-serif;
+
+  /* Type scale (px): 12 meta · 14 ui · 16 body · 20 section · 28 page · 44 display · 64 hero */
+  --text-meta: 0.75rem;
+  --text-meta--line-height: 1.5;
+  --text-ui: 0.875rem;
+  --text-ui--line-height: 1.55;
+  --text-body: 1rem;
+  --text-body--line-height: 1.7;
+  --text-section: 1.25rem;
+  --text-section--line-height: 1.45;
+  --text-page: 1.75rem;
+  --text-page--line-height: 1.3;
+  --text-display: 2.75rem;
+  --text-display--line-height: 1.2;
+  --text-hero: 4rem;
+  --text-hero--line-height: 1.15;
+
+  --radius-card: 10px;
+  --radius-panel: 16px;
+  --radius-window: 24px;
+
+  --shadow-pop: var(--shadow-pop);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: 1.7;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Hide scrollbars on horizontal rails, keep them scrollable. */
+.rail {
+  scrollbar-width: none;
+}
+.rail::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
