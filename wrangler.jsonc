@@ -1,7 +1,7 @@
 // Cloudflare Workers config for the OpenNext build (`npx opennextjs-cloudflare build` writes .open-next/).
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "brandak-website",
+  "name": "fatrina-web",
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
@@ -13,7 +13,7 @@
     {
       // Must match "name" above.
       "binding": "WORKER_SELF_REFERENCE",
-      "service": "brandak-website"
+      "service": "fatrina-web"
     }
   ],
   "observability": { "enabled": true }
