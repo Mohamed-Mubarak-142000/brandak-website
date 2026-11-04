@@ -14,7 +14,7 @@ import { StoreTypeFronts } from '@/components/sell/StoreTypeFronts';
 import { getBrands, getTerms } from '@/lib/api';
 import { sellerFaq, withRate } from '@/lib/content';
 import { num, percent } from '@/lib/format';
-import { appPath, SITE_URL } from '@/lib/links';
+import { appPath, PLAY_URL } from '@/lib/links';
 import { STORE_TYPES } from '@/lib/store-types';
 
 export const metadata: Metadata = {
@@ -178,8 +178,8 @@ export default async function SellPage() {
             </div>
           </div>
           <div className="hidden shrink-0 items-center gap-4 rounded-panel bg-surface p-4 shadow-card lg:flex">
-            <QrCode value={`${SITE_URL}/download?open=${encodeURIComponent(appPath.sell)}`} size={112} label="كود QR لفتح متجر من تطبيق فاترينة" />
-            <p className="max-w-36 text-ui font-bold">امسح الكود بموبايلك وابدأ على طول</p>
+            <QrCode value={PLAY_URL} size={112} label="كود QR لتطبيق فاترينة على Google Play" />
+            <p className="max-w-36 text-ui font-bold">امسح الكود وحمّل التطبيق من Google Play</p>
           </div>
         </div>
       </Container>

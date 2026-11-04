@@ -7,7 +7,7 @@ import { AndroidOpen } from '@/components/info/AndroidOpen';
 import { PhoneFrame } from '@/components/info/PhoneFrame';
 import { QrCode } from '@/components/QrCode';
 import { Carousel } from '@/components/ui/Carousel';
-import { PLAY_URL, SITE_URL } from '@/lib/links';
+import { PLAY_URL } from '@/lib/links';
 
 export const metadata: Metadata = {
   title: 'حمّل تطبيق فاترينة',
@@ -54,7 +54,6 @@ export default async function DownloadPage({ searchParams }: { searchParams: Pro
   const path = cleanPath((await searchParams).open);
   const android = /android/i.test((await headers()).get('user-agent') ?? '');
   const note = targetNote(path);
-  const qrValue = `${SITE_URL}/download${path ? `?open=${encodeURIComponent(path)}` : ''}`;
 
   return (
     <Container className="py-10 sm:py-14">
@@ -62,7 +61,8 @@ export default async function DownloadPage({ searchParams }: { searchParams: Pro
         <div className="min-w-0">
           <h1 className="text-page font-extrabold sm:text-display">حمّل فاترينة على موبايلك</h1>
           <p className="mt-3 max-w-xl text-body text-ink-2 sm:text-section sm:leading-relaxed">
-            {note ?? 'براندات ومعارض ومخازن ومحلات مصرية في مكان واحد. اطلب وادفع كاش لما الطلب يوصلك.'}
+            {/* Only Android opens the exact screen; the QR elsewhere goes straight to Google Play. */}
+            {(android && note) || 'براندات ومعارض ومخازن ومحلات مصرية في مكان واحد. اطلب وادفع كاش لما الطلب يوصلك.'}
           </p>
 
           <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">
@@ -83,11 +83,11 @@ export default async function DownloadPage({ searchParams }: { searchParams: Pro
           {!android ? (
             <div className="mt-8 flex flex-col gap-6 rounded-window border border-line bg-surface p-6 shadow-card sm:flex-row sm:items-center sm:p-7">
               <div className="shrink-0 self-center rounded-panel bg-sunken p-3">
-                <QrCode value={qrValue} size={184} label="كود QR لتحميل تطبيق فاترينة" />
+                <QrCode value={PLAY_URL} size={184} label="كود QR لتطبيق فاترينة على Google Play" />
               </div>
               <div className="min-w-0">
                 <p className="text-section font-extrabold">امسح الكود بكاميرا موبايلك</p>
-                <p className="mt-1 text-ink-2">{note ? `وبعد ما تنزّله، ${note}` : 'هيفتحلك صفحة التحميل على موبايلك على طول.'}</p>
+                <p className="mt-1 text-ink-2">هيفتحلك فاترينة على Google Play على طول.</p>
                 <a
                   href={PLAY_URL}
                   className="mt-5 inline-flex min-h-14 items-center gap-3 rounded-card bg-ink px-5 text-surface transition-opacity hover:opacity-90"

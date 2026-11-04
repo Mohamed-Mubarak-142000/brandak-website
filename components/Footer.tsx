@@ -2,7 +2,7 @@ import { Banknote, Mail, ShieldCheck, Truck } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { PLAY_URL, SITE_URL, SUPPORT_EMAIL } from '@/lib/links';
+import { PLAY_URL, SUPPORT_EMAIL } from '@/lib/links';
 import { STORE_TYPES } from '@/lib/store-types';
 import type { Category } from '@/lib/types';
 
@@ -64,7 +64,7 @@ export function Footer({ categories }: { categories: Category[] }) {
           </Link>
           <p className="mt-3 max-w-xs text-ui text-ink-2">براندات ومعارض ومخازن ومحلات مصرية في مكان واحد. تصفّح هنا، واطلب من التطبيق.</p>
           <div className="mt-5 flex items-center gap-4 rounded-panel bg-surface p-3 shadow-card">
-            <QrCode value={`${SITE_URL}/download`} size={84} label="امسح الكود عشان تحمّل التطبيق" />
+            <QrCode value={PLAY_URL} size={84} label="امسح الكود عشان تحمّل التطبيق من Google Play" />
             <div>
               <p className="text-ui font-bold">حمّل التطبيق</p>
               <p className="text-meta text-ink-3">امسح الكود بكاميرا موبايلك</p>
